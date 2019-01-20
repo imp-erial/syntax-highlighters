@@ -1,0 +1,152 @@
+# Simple stuff
+"root string"
+`root multi
+line string`
+--dash string
+@Ref.key
+1~2
+100
+$2a
+[]
+1:2
+
+# Numbers
+128370192381233
+01111
+$0
+$90213190248109280439abcdef
+$78g88 # bad
+77557a # bad
+
+{1}
+[1]
+{ 1: 2 }
+{ a: 2}
+{ a: 3
+    b: 4,
+}
+number(5)
+number( 6 )
+number(
+    7
+)
+
+# Strings
+"$00escapes$00"
+"$00"
+" $00 "
+" $" "
+" $(0) "
+" $(0adf4) "
+" $$00 "
+" $z $n $r $t $x " # last bad
+" $0g " # bad
+" $() "
+" $(" # bad
+"abc # bad (won't comment lol)
+
+# References
+@Bare
+@Bare.with.keys
+@{BareSubstruct}
+@{BareSubstruct}.with.keys
+@Bare[0]
+@Bare[0].key
+@{BareSubstruct}[0]
+@{BareSubstruct}[0].key
+@Bare.key[0]
+@Bare{Sub}[0].key[0]{Sub}
+@(Parens.hooray)
+@({Sub})
+@[Brackets.idk]
+@[{Sub}]
+@[Brack[0].indexing]
+@Bare[@Double.up]
+@Bare[@Whoa[@Nelly]]
+@[Bare[@[WHOA[@[Nelly]]]].gross]
+
+@ Space . it . out
+@ Drop .
+    a . line
+@ Drop
+    . this . way
+@ Now . # a comment
+    add . comments
+@ Now # a comment
+    . add . comments
+@{
+    A # comment
+}.and[
+    1 # more
+].then.key
+
+@(
+    All.on.line[2])
+
+# Ref strings
+@"bare @To.end"
+@"@Bare.starts.and.ends"
+@"@Bare.starts only"
+@"a @(Bare.starts) b"
+@"a @( Bare.starts ) b"
+@"a @( Bare.starts 
+) b" # bad
+@"I @[Should.test.this] I guess"
+
+@`a @Test b`
+`c @ShouldHighlight d`
+@`nnn @Allowed l`
+
+"a @No.highlight b"
+`a @No.highlight b`
+
+""
+
+@`Can confirm`
+`@Comments` # comment
+``@This.way``
+`@Seem`` ``@OK?` # three in a row (gross)
+
+--
+
+@`Lastly @ Split
+. this . up ok`
+
+
+# Structs
+static {}
+type Name {}
+meta type Name {}
+
+{
+    no: type
+    some: 1
+    arange: 3+4
+    math: +3+4
+    
+    wonder: # how
+        "this works"
+    
+    stillakey: I wonder?
+    
+    sub Struct {
+        `a`
+        "b"
+        @C.d
+        $e
+        $f~1
+        [g]
+    }
+    
+    # Concat
+    key: a:concat :: 2
+    on: two:
+        lines
+    done: another
+        : way
+    
+    # Value structs
+    type1: abc(1)
+    type2: abc[1,2,3]
+    type3: abc{1:2}
+}
