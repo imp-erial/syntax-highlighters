@@ -1,0 +1,995 @@
+#################################################################
+## Resource RePLacement Language (RPL)
+## Copyright 2019 Sapphire Becker (logicplace.com)
+## MPL 2.0 Licensed
+##
+## Version 1.3.0-d
+################################################################ 
+
+name                   = rpl
+file_extensions []     = rpl ;
+
+################################################################
+## Constants
+################################################################
+
+__KEYWORDS \= (false|true|undefined|black|white|red|blue|green|yellow|magenta|pink|cyan|gray|grey|transparent|byte|short|long|double|LRUD|LRDU|RLUD|RLDU|UDLR|UDRL|DULR|DURL|LU|LD|RU|RD|UL|UR|DL|DR|big|little|(?:un)?signed|left|right|r?center|l?both|expand|\*)
+
+__KEYTYPES \= (ROM|RPL|rom|rpl)
+
+__KEYREFS \= (this|g*parent|w*back|Defs)
+
+__NUMBER  \= \b(\d+)
+__HEX     \= [\da-fA-F]
+__HEXNUM  \= $${__HEX}+
+__NUMERIC \= (?:$${__NUMBER}|(\$$${__HEXNUM}))
+
+__MID_LITERAL \= [^:,#(){}\[\]]
+
+__SIMPLE \= (\b[a-z]+\d*)
+__STRUCT_NAME \= [\w_\d]+
+
+################################################################
+## Styles
+################################################################
+
+styles [] {
+
+.comment : style {
+   color                 = light_green
+   italic                = true
+   textmate_scope        = comment.line.number-sign
+   pygments_scope        = Comment.Single
+}
+
+.comment_mark : style {
+   color                 = light_green
+   italic                = true
+   textmate_scope        = punctuation.definition.comment
+   pygments_scope        = Comment.Single
+}
+
+
+.keyword : style {
+   color                 = cyan
+   textmate_scope        = keyword
+   pygments_scope        = Keyword
+}
+
+.keytype : style {
+   color                 = cyan
+   textmate_scope        = keyword
+   pygments_scope        = Keyword
+   # TODO: merge with .type styles ?
+}
+
+.keyref : style {
+   color                 = cyan
+   textmate_scope        = variable.language
+   pygments_scope        = Keyword
+}
+
+
+.number : style {
+   color                 = gold
+   textmate_scope        = constant.numeric.integer.decimal
+   pygments_scope        = Number
+}
+
+.non_decimal : style {
+   color                 = gold
+   textmate_scope        = constant.numeric.integer.non-decimal
+   pygments_scope        = Number
+}
+
+.binary : style {
+   color                 = gold
+   textmate_scope        = constant.numeric.integer.binary
+   pygments_scope        = Number.Bin
+}
+
+.octal : style {
+   color                 = gold
+   textmate_scope        = constant.numeric.integer.octal
+   pygments_scope        = Number.Oct
+}
+
+.hexadecimal : style {
+   color                 = gold
+   textmate_scope        = constant.numeric.integer.hexadecimal
+   pygments_scope        = Number.Hex
+}
+
+
+.punctuation : style {
+   color                 = red_2
+   textmate_scope        = punctuation
+   pygments_scope        = Punctuation
+}
+
+.paren : style {
+   color                 = red_2
+   textmate_scope        = meta.brace.round.rpl
+   pygments_scope        = Punctuation
+}
+
+.bracket : style {
+   color                 = red_2
+   textmate_scope        = meta.brace.square.rpl
+   pygments_scope        = Punctuation
+}
+
+.angle.begin : style {
+   color                 = red_2
+   textmate_scope        = punctuation.definition.generic.begin
+   pygments_scope        = Punctuation
+}
+
+.angle.end : style {
+   color                 = red_2
+   textmate_scope        = punctuation.definition.generic.end
+   pygments_scope        = Punctuation
+}
+
+.range_mark : style {
+   color                 = red_2
+   textmate_scope        = keyword.operator.range
+   pygments_scope        = Operator
+}
+
+.operator : style {
+   color                 = red_2
+   textmate_scope        = keyword.operator
+   pygments_scope        = Operator
+}
+
+.comma : style {
+   color                 = red_2
+   textmate_scope        = meta.delimiter.object.comma
+   pygments_scope        = Punctuation
+}
+
+.string.begin : style {
+   color                 = red_2
+   textmate_scope        = punctuation.definition.string.begin
+   pygments_scope        = Punctuation
+}
+
+.string.end : style {
+   color                 = red_2
+   textmate_scope        = punctuation.definition.string.end
+   pygments_scope        = Punctuation
+}
+
+.reference.begin : style {
+   color                 = red
+   textmate_scope        = punctuation.definition.mapping.begin
+   pygments_scope        = Punctuation
+}
+
+
+.literal : style {
+   color                 = brown
+   textmate_scope        = text.unquoted
+   pygments_scope        = String.Heredoc
+}
+
+.squoted_text : style {
+   color                 = brown
+   textmate_scope        = string.quoted.single
+   pygments_scope        = String.Single
+}
+
+.dquoted_text : style {
+   color                 = brown
+   textmate_scope        = string.quoted.double
+   pygments_scope        = String.Double
+}
+
+.mquoted_text : style {
+   color                 = brown
+   textmate_scope        = string.quoted.single.block
+}
+
+.dashed_text : style {
+   color                 = brown
+   textmate_scope        = string.quoted
+   pygments_scope        = String.Heredoc
+}
+
+.escaped_text : style {
+   color                 = red_2
+   textmate_scope        = constant.character.escape
+   pygments_scope        = String.Escape
+}
+
+
+.type : style {
+   color                 = orange
+   textmate_scope        = storage.type
+   pygments_scope        = Keyword.Type
+}
+
+.name : style {
+   color                 = orange
+   textmate_scope        = entity.name.type
+   pygments_scope        = Name.Entity
+}
+
+.key : style {
+   color                 = pink
+   textmate_scope        = support.variable
+   pygments_scope        = Name.Attribute
+}
+
+
+.none : style {
+   textmate_scope        = none
+}
+
+.illegal : style {
+   color                 = white
+   background_color      = red
+   textmate_scope        = invalid.illegal
+   pygments_scope        = Generic.Error
+}
+
+}
+
+#################################################
+## Parse contexts
+#################################################
+
+contexts [] {
+
+##############################################
+## Main (Root) Context - Entry point context
+##############################################
+
+main : context {
+   : include "comment" ;
+   : include "strings" ;
+   : include "reference" ;
+   : include "range" ;
+   : include "numeric" ;
+   : include "list" ;
+   : include "concat" ;
+   : include "struct_type" ;
+   : include "struct_name" ;
+   : include "struct_body" ;
+}
+
+##############################################
+## Other major contexts
+##############################################
+
+value_body : context {
+   : pop {
+      regex    \= (,|(?=[)\]}]))
+      styles [] = .comma ;
+   }
+   : include "comment" ;
+   : include "strings" ;
+   : include "reference" ;
+   : include "range" ;
+   : include "numeric" ;
+   : include "list" ;
+   : include "concat" ;
+   : include "literals" ;
+   : include "value_struct_tp" ;
+   : include "value_struct_tl" ;
+   : include "value_struct_tb" ;
+}
+
+
+key_value_body : context {
+   : pop {
+      regex    \= (,|(?=})|^(?=\s*[^:\s(\[{]))
+      styles [] = .comma ;
+   }
+
+   : include "comment" ;
+   : include "strings" ;
+   : include "reference" ;
+   : include "range" ;
+   : include "numeric" ;
+   : include "list" ;
+   : include "concat" ;
+   : include "literals" ;
+   : include "value_struct_tp" ;
+   : include "value_struct_tl" ;
+   : include "value_struct_tb" ;
+   : include "value_struct_p" ;
+   : include "struct_body" ;
+}
+
+struct_body : context {
+   : inline_push {
+      regex    \= (\{)
+      styles [] = .punctuation ;
+      space_unimportant = true
+      
+      : pop {
+         regex    \= (\})
+         styles [] = .punctuation ;
+      }
+      
+      : include "comment" ;
+      
+      : push {
+         regex     \= (:)
+         styles  [] = .key ;
+         context    = key_value_body
+      }
+      
+      : include "comment" ;
+      : include "strings" ;
+      : include "reference" ;
+      : include "range" ;
+      : include "numeric" ;
+      
+      : push {
+         regex     \= ($${__SIMPLE}\s*:)
+         styles  [] = .key ;
+         context    = key_value_body
+      }
+   
+      : include "list" ;
+      : include "struct_type" ;
+      : include "struct_name" ;
+      : include "struct_body" ;
+   }
+}
+
+list : context {
+   : inline_push {
+      regex    \= (\[)
+      styles [] = .punctuation ;
+      
+      : pop {
+         regex    \= (\])
+         styles [] = .punctuation ;
+      }
+      
+      : push {
+         regex     \= (?=.)
+         styles  [] = .punctuation ;
+         context    = value_body
+      }
+   }
+}
+
+###########################################
+## Tokens
+###########################################
+
+comment : context {
+   : pattern {
+      regex    \= (#+)(.*$)
+      styles [] = .comment_mark, .comment ;
+   }
+}
+
+numeric : context {
+   : pattern {
+      regex    \= $${__NUMERIC}(?=\s*[,#:)\]}]|\s*$)
+      styles [] = .number, .non_decimal ;
+   }
+}
+
+string_escape : context {
+   : pattern {
+      regex    \= (\$(?:$${__HEX}{2}|\($${__HEX}*\)|["'`znrt$@]))|(\$.)
+      styles [] = .escaped_text, .illegal ;
+   }
+}
+
+range : context {
+   : pattern {
+      regex     \= $${__NUMERIC}(\s*)([\-~*+±]|\+-)(\s*)$${__NUMERIC}
+      styles []  = .number, .hexadecimal, .none, .range_mark, .none, .number, .hexadecimal ;
+   }
+}
+
+concat : context {
+   : pattern {
+      regex    \= (::?)
+      styles [] = .punctuation ;
+   }
+}
+
+struct_type : context {
+   : pattern {
+      regex    \= $${__KEYTYPES}|$${__SIMPLE}
+      styles [] = .keytype, .type ;
+   }
+}
+
+struct_name : context {
+   : pattern {
+      regex    \= (\b$${__STRUCT_NAME})
+      styles [] = .name ;
+   }
+}
+
+value_struct_tp : context {
+   : inline_push {
+      regex    \= $${__SIMPLE}(?=\s*\()
+      styles [] = .type ;
+      
+      : pop {
+         regex    \= (\))
+         styles [] = .paren ;
+      }
+      
+      : push {
+         regex     \= (\()
+         styles  [] = .paren ;
+         context    = value_body
+      }
+   }
+}
+
+value_struct_p : context {
+   : inline_push {
+      regex    \= (?=\()
+      styles [] = .type ;
+      
+      : pop {
+         regex    \= (\))
+         styles [] = .paren ;
+      }
+      
+      : push {
+         regex     \= (\()
+         styles  [] = .paren ;
+         context    = value_body
+      }
+   }
+}
+
+value_struct_tl : context {
+   : inline_push {
+      regex    \= $${__SIMPLE}(?=\s*\[)
+      styles [] = .type ;
+      
+      : pop {
+         regex    \= (\])
+         styles [] = .bracket ;
+      }
+      
+      : push {
+         regex     \= (\[)
+         styles  [] = .bracket ;
+         context    = value_body
+      }
+   }
+}
+
+value_struct_tb : context {
+   : inline_push {
+      regex    \= $${__SIMPLE}(?=\s*\{)
+      styles [] = .type ;
+      
+      : pop {
+         regex    \= (\})
+         styles [] = .punctuation ;
+      }
+      
+      : include "struct_body" ;
+   }
+}
+
+
+###########################################
+## Strings
+###########################################
+
+# TODO: j2
+strings : context {
+   : include "refstr" ;
+   : include "string" ;
+   : include "dash_refstring" ;
+   : include "math_dash_string" ;
+   : include "dash_string" ;
+   : include "refmultistr" ;
+   : include "math_quoted3" ;
+   : include "math_quoted1" ;
+   : include "multistr" ;
+}
+
+literals : context {
+   : include "math_literal" ;
+   : include "literal" ;
+}
+
+literal : context {
+   : pattern {
+      regex    \= (?=\S)(?!\w+\d*\s*[({\[])(?:$${__KEYWORDS}|($${__MID_LITERAL}+))
+      styles [] = .keyword, .literal ;
+   }
+}
+
+math_body : context {
+   : pattern {
+      regex    \= ((?:\$\$|0x)$${__HEXNUM})
+      styles [] = .hexadecimal ;
+   }
+   : pattern {
+      regex    \= (0o[0-7]+)
+      styles [] = .octal ;
+   }
+   : pattern {
+      regex    \= ((?:0b|%)[01]+)
+      styles [] = .binary ;
+   }
+   : pattern {
+      regex    \= (\d+_\d+)
+      styles [] = .non_decimal ;
+   }
+   : pattern {
+      regex    \= $${__NUMBER}
+      styles [] = .number ;
+   }
+   : include "string_escape" ;
+   : pattern {
+      regex    \= (\*\*|<<|>>|[-+*/&|^%])
+      styles [] = .operator ;
+   }
+   : pattern {
+      regex    \= (<)|(>)
+      styles [] = .angle.begin, .angle.end ;
+   }
+}
+
+math_literal : context {
+   : inline_push {
+      regex    \= (\+)
+      styles [] = .operator ;
+      
+      : pop {
+         regex    \= (?!$${__MID_LITERAL})|(?=$)
+         styles [] = ;
+      }
+      
+      : include "math_body" ;
+   }
+}
+
+math_quoted1 : context {
+   : inline_push {
+      regex    \= (`)(\+)
+      styles [] = .string.begin, .operator ;
+      
+      : pop {
+         regex    \= (`)
+         styles [] = .string.end ;
+      }
+      
+      : include "math_body" ;
+      : pattern {
+         regex    \= ([()])
+         styles [] = .paren ;
+      }
+   }
+}
+
+math_quoted3 : context {
+   : inline_push {
+      regex    \= (```)(\+)
+      styles [] = .string.begin, .operator ;
+      
+      : pop {
+         regex    \= (```)
+         styles [] = .string.end ;
+      }
+      
+      : include "math_body" ;
+      : pattern {
+         regex    \= ([()])
+         styles [] = .paren ;
+      }
+   }
+}
+
+math_dash_string : context {
+   : inline_push {
+      regex        \= (--)(\+)
+      styles []     = .string.begin, .operator ;
+      : eol_pop {}
+      : include "math_body" ;
+      : pattern {
+         regex    \= ([()])
+         styles [] = .paren ;
+      }
+   }
+}
+
+refstr : context {
+   : inline_push {
+      regex         \= (@)(")
+      styles []      = .reference.begin, .string.begin ;
+      : pop {
+         regex      \= (")|(.$)
+         styles []   = .string.end, .illegal ;
+      }
+      : include "string_escape" ;
+      : include "is_reference" ;
+      : pattern {
+         regex      \= ([^"$@]+(?!$))
+         styles []   = .dquoted_text ;
+      }
+   }
+}
+
+string : context {
+   : inline_push {
+      regex         \= (")
+      styles []      = .string.begin ;
+      : pop {
+         regex      \= (")|(.$)
+         styles []   = .string.end, .illegal ;
+      }
+      : include "string_escape" ;
+      : pattern {
+         regex      \= ([^"$]+(?!$))
+         styles []   = .dquoted_text ;
+      }
+   }
+}
+
+dash_string : context {
+   : inline_push {
+      regex        \= (--)
+      styles []     = .string.begin ;
+      : eol_pop {}
+      : include "string_escape" ;
+      : pattern {
+         regex      \= ([^$]+(?!$))
+         styles []   = .dashed_text ;
+      }
+   }
+}
+
+dash_refstring : context {
+   : inline_push {
+      regex         \= (@)(--)
+      styles []      = .reference.begin, .string.begin ;
+      : eol_pop {}
+      : include "string_escape" ;
+      : include "is_reference" ;
+      : pattern {
+         regex      \= ([^@$]+(?!$))
+         styles []   = .dashed_text ;
+      }
+   }
+}
+
+
+###########################################
+## Multi-line strings
+###########################################
+
+multistr : context {
+   : inline_push {
+      regex    \= (?=`)
+      styles [] = .none ;
+      
+      : pop {
+         regex    \= (,|^(?=\s*[^#`]))
+         styles [] = .punctuation ;
+      }
+      
+      : include "multistr_block" ;
+   }
+}
+
+multistr_block : context {
+   : include "comment" ;
+   : include "multistr_3" ;
+   : include "multistr_2" ;
+   : include "multistr_1" ;
+}
+
+# TODO: j2
+multistr_1 : context {
+   : inline_push {
+      regex    \= (`(?!`))
+      styles [] = .string.begin ;
+      
+      : pop {
+         regex    \= (`)
+         styles [] = .string.end ;
+      }
+      
+      : include "multistr_inner" ;
+   }
+}
+
+multistr_2 : context {
+   : inline_push {
+      regex    \= (``(?!`))
+      styles [] = .string.begin ;
+      
+      : pop {
+         regex    \= (``)
+         styles [] = .string.end ;
+      }
+      
+      : include "multistr_inner" ;
+   }
+}
+
+multistr_3 : context {
+   : inline_push {
+      regex    \= (```(?!`))
+      styles [] = .string.begin ;
+      
+      : pop {
+         regex    \= (```)
+         styles [] = .string.end ;
+      }
+      
+      : include "multistr_inner" ;
+   }
+}
+
+multistr_inner : context {
+   : include "string_escape" ;
+   : pattern {
+      regex    \= ([^`$]+)
+      styles [] = .mquoted_text ;
+   }
+}
+
+
+refmultistr : context {
+   : inline_push {
+      regex    \= (?=@`)
+      styles [] = .none ;
+      
+      : pop {
+         regex    \= (,|^(?=\s*(?![#`]|@`)))
+         styles [] = .punctuation ;
+      }
+      
+      : include "refmultistr_block" ;
+   }
+}
+
+refmultistr_block : context {
+   : include "comment" ;
+   : include "refmultistr_2" ;
+   : include "refmultistr_1" ;
+}
+
+# TODO: j2
+refmultistr_1 : context {
+   : inline_push {
+      regex    \= (@?)(`(?!`))
+      styles [] = .reference.begin, .string.begin ;
+      
+      : pop {
+         regex    \= (`)
+         styles [] = .string.end ;
+      }
+      
+      : include "refmultistr_inner" ;
+   }
+}
+
+refmultistr_2 : context {
+   : inline_push {
+      regex    \= (@?)(``(?!`))
+      styles [] = .reference.begin, .string.begin ;
+      
+      : pop {
+         regex    \= (``)
+         styles [] = .string.end ;
+      }
+      
+      : include "refmultistr_inner" ;
+   }
+}
+
+refmultistr_inner : context {
+   : include "string_escape" ;
+   : include "reference" ;
+   : pattern {
+      regex    \= ([^`$@]+)
+      styles [] = .mquoted_text ;
+   }
+}
+
+###########################################
+## References
+###########################################
+
+reference : context {
+   : include "reference_paren" ;
+   : include "reference_brack" ;
+   : include "reference_bare" ;
+}
+
+reference_paren : context {
+   : inline_push {
+      regex    \= (@)(\s*)(\()
+      styles [] = .reference.begin, .none, .paren ;
+      : pop {
+         regex    \= (\))
+         styles [] = .paren ;
+      }
+      : include "reference_begin" ;
+   }
+}
+
+reference_brack : context {
+   : inline_push {
+      regex    \= (@)(\s*)(\[)
+      styles [] = .reference.begin, .none, .bracket ;
+      : pop {
+         regex    \= (\])
+         styles [] = .bracket ;
+      }
+      : include "reference_begin" ;
+   }
+}
+
+reference_bare : context {
+   : push {
+      regex    \= (@)(\s*)(?:$${__KEYREFS}|($${__STRUCT_NAME})|)
+      styles [] = .reference.begin, .none, .keyref, .name ;
+      context   = reference_inner
+   }
+}
+
+reference_begin : context {
+   : push {
+      regex    \= (?:$${__KEYREFS}|($${__STRUCT_NAME})|)
+      styles [] = .keyref, .name ;
+      context   = reference_inner
+   }
+}
+
+reference_inner : context {
+   space_unimportant = true
+   : pop {
+      regex    \= (?![\[{.\s#])
+      styles [] = ;
+   }
+   : include "comment" ;
+   : include "index" ;
+   : include "subscript" ;
+   : include "reference_key" ;
+}
+
+index : context {
+   : inline_push {
+      regex    \= (\[)
+      styles [] = .bracket ;
+      : pop {
+         regex    \= (\])
+         styles [] = .bracket ;
+      }
+      : include "comment" ;
+      : include "numeric" ;
+      : include "reference" ;
+   }
+}
+
+subscript : context {
+   : inline_push {
+      regex    \= (\{)
+      styles [] = .punctuation ;
+      : pop {
+         regex    \= (\})
+         styles [] = .punctuation ;
+      }
+      : include "comment" ;
+      : include "literal" ;
+   }
+}
+
+reference_key : context {
+   : inline_push {
+      regex    \= (\.)
+      styles [] = .punctuation ;
+      : pop {
+         regex    \= $${__SIMPLE}
+         styles [] = .key ;
+      }
+      : include "comment" ;
+   }
+}
+
+
+# Interpolated string reference
+is_reference : context {
+   : include "is_reference_paren" ;
+   : include "is_reference_brack" ;
+   : include "is_reference_bare" ;
+}
+
+is_reference_paren : context {
+   : inline_push {
+      regex    \= (@)(\()(\s*)
+      styles [] = .reference.begin, .paren, .none ;
+      : pop {
+         regex    \= (?:\s*(\))|(?=.?$|"))
+         styles [] = .paren ;
+      }
+      : include "is_reference_begin" ;
+   }
+}
+
+is_reference_brack : context {
+   : inline_push {
+      regex    \= (@)(\[)(\s*)
+      styles [] = .reference.begin, .bracket, .none ;
+      : pop {
+         regex    \= (?:\s*(\])|(?=.?$|"))
+         styles [] = .bracket ;
+      }
+      : include "is_reference_begin" ;
+   }
+}
+
+is_reference_bare : context {
+   : push {
+      regex    \= (@)($${__STRUCT_NAME}|)
+      styles [] = .reference.begin, .name ;
+      context   = is_reference_inner
+   }
+}
+
+is_reference_begin : context {
+   : push {
+      regex    \= ($${__STRUCT_NAME}|)
+      styles [] = .name ;
+      context   = is_reference_inner
+   }
+}
+
+is_reference_inner : context {
+   : pop {
+      regex    \= (?![\[{.])
+      styles [] = ;
+   }
+   : include "is_index" ;
+   : include "is_subscript" ;
+   : include "is_reference_key" ;
+}
+
+is_index : context {
+   : inline_push {
+      regex    \= (\[)
+      styles [] = .bracket ;
+      : pop {
+         regex    \= (\]|(?=.$|"))
+         styles [] = .bracket ;
+      }
+      : include "numeric" ;
+      : include "is_reference" ;
+   }
+}
+
+is_subscript : context {
+   : inline_push {
+      regex    \= (\{)
+      styles [] = .punctuation ;
+      : pop {
+         regex    \= (\}|(?=.$|"))
+         styles [] = .punctuation ;
+      }
+      : include "literal" ;
+   }
+}
+
+is_reference_key : context {
+   : pattern {
+      regex    \= (\.)$${__SIMPLE}
+      styles [] = .punctuation, .key ;
+   }
+}
+   
+}
