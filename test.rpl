@@ -87,9 +87,9 @@ number(
 @"bare @To.end"
 @"@Bare.starts.and.ends"
 @"@Bare.starts only"
-@"a @(Bare.starts) b"
-@"a @( Bare.starts ) b"
-@"a @( Bare.starts 
+@"a @(Paren.mid) b"
+@"a @( Paren.spaced ) b"
+@"a @( Paren.bad 
 ) b" # bad
 @"I @[Should.test.this] I guess"
 
