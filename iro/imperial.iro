@@ -2,7 +2,7 @@
 ## Resource RePLacement Language (RPL)
 ## Copyright 2019 Sapphire Becker (logicplace.com)
 ## MPL 2.0 Licensed
-################################################################ 
+################################################################
 
 name                   = rpl
 file_extensions []     = rpl ;
@@ -45,7 +45,7 @@ __HEX     \= \da-fA-F
 __NUMBER  \= (\b\d+)
 __HEXNUM  \= [$${__HEX}]+
 __NUMERIC \= (?:$${__NUMBER}|([$${__DOLLAR}]$${__HEXNUM}))
-__RANGE \= (\+-|[-~*+±])
+__RANGE \= ([-~*+±]|\+-)
 __OPERATOR \= (\*\*|<<|>>|[-+*/&|^%])
 __DASHQ \= (--|[–—―])
 __SUBSCRIPT1 \= .\-─
@@ -295,7 +295,7 @@ main : context {
 value_body : context {
    : pop {
       regex    \= ([$${__COMMA}]|(?=[$${__RMAJOR}]))
-      styles [] = .comma ;
+      styles [] = .comma;
    }
    : include "comment" ;
    : include "strings" ;
@@ -314,7 +314,7 @@ value_body : context {
 key_value_body : context {
    : pop {
       regex    \= ([$${__COMMA}]|(?=[$${__RBRACE}])|^(?=\s*[^\s$${__COLON}$${__LMAJOR}]))
-      styles [] = .comma ;
+      styles [] = .comma;
    }
 
    : include "comment" ;
@@ -335,34 +335,34 @@ key_value_body : context {
 struct_body : context {
    : inline_push {
       regex    \= ([$${__LBRACE}])
-      styles [] = .punctuation ;
+      styles [] = .punctuation;
       space_unimportant = true
-      
+
       : pop {
          regex    \= ([$${__RBRACE}])
-         styles [] = .punctuation ;
+         styles [] = .punctuation;
       }
-      
+
       : include "comment" ;
-      
+
       : push {
          regex     \= ([$${__COLON}])
-         styles  [] = .key ;
+         styles  [] = .key;
          context    = key_value_body
       }
-      
+
       : include "comment" ;
       : include "strings" ;
       : include "reference" ;
       : include "range" ;
       : include "numeric" ;
-      
+
       : push {
          regex     \= (\b$${__SIMPLE}\s*[$${__COLON}])
-         styles  [] = .key ;
+         styles  [] = .key;
          context    = key_value_body
       }
-   
+
       : include "list" ;
       : include "struct_type" ;
       : include "struct_name" ;
@@ -373,16 +373,16 @@ struct_body : context {
 list : context {
    : inline_push {
       regex    \= ([$${__LBRACK}])
-      styles [] = .punctuation ;
-      
+      styles [] = .punctuation;
+
       : pop {
          regex    \= ([$${__RBRACK}])
-         styles [] = .punctuation ;
+         styles [] = .punctuation;
       }
-      
+
       : push {
          regex     \= (?=.)
-         styles  [] = .none ;
+         styles  [] = .none;
          context    = value_body
       }
    }
@@ -395,65 +395,65 @@ list : context {
 comment : context {
    : pattern {
       regex    \= ([$${__HASH}]+)(.*$)
-      styles [] = .comment_mark, .comment ;
+      styles [] = .comment_mark, .comment;
    }
 }
 
 numeric : context {
    : pattern {
       regex    \= $${__NUMERIC}(?=\s*[$${__COLON}$${__COMMA}$${__HASH}$${__RMAJOR}]|\s*$)
-      styles [] = .number, .non_decimal ;
+      styles [] = .number, .non_decimal;
    }
 }
 
 string_escape : context {
    : pattern {
       regex    \= ([$${__DOLLAR}](?:[$${__HEX}]{2}|\([$${__HEX}]*\)|$${__ESCAPABLE}))|([$${__DOLLAR}].)
-      styles [] = .escaped_text, .illegal ;
+      styles [] = .escaped_text, .illegal;
    }
 }
 
 range : context {
    : pattern {
       regex     \= $${__NUMERIC}(\s*)$${__RANGE}(\s*)$${__NUMERIC}
-      styles []  = .number, .hexadecimal, .none, .range_mark, .none, .number, .hexadecimal ;
+      styles []  = .number, .hexadecimal, .none, .range_mark, .none, .number, .hexadecimal;
    }
 }
 
 concat : context {
    : pattern {
       regex    \= ([$${__COLON}])(\1?)
-      styles [] = .punctuation, .punctuation ;
+      styles [] = .punctuation, .punctuation;
    }
 }
 
 struct_type : context {
    : pattern {
       regex    \= $${__KEYTYPES}|(\b$${__SIMPLE})
-      styles [] = .keytype, .type ;
+      styles [] = .keytype, .type;
    }
 }
 
 struct_name : context {
    : pattern {
       regex    \= (\b$${__STRUCT_NAME})
-      styles [] = .name ;
+      styles [] = .name;
    }
 }
 
 value_struct_tp : context {
    : inline_push {
       regex    \= (\b$${__SIMPLE})(?=\s*[$${__LPAREN}])
-      styles [] = .type ;
-      
+      styles [] = .type;
+
       : pop {
          regex    \= ([$${__RPAREN}])
-         styles [] = .paren ;
+         styles [] = .paren;
       }
-      
+
       : push {
          regex     \= ([$${__LPAREN}])
-         styles  [] = .paren ;
+         styles  [] = .paren;
          context    = value_body
       }
    }
@@ -462,16 +462,16 @@ value_struct_tp : context {
 value_struct_p : context {
    : inline_push {
       regex    \= (?=[$${__LPAREN}])
-      styles [] = .type ;
-      
+      styles [] = .type;
+
       : pop {
          regex    \= ([$${__RPAREN}])
-         styles [] = .paren ;
+         styles [] = .paren;
       }
-      
+
       : push {
          regex     \= ([$${__LPAREN}])
-         styles  [] = .paren ;
+         styles  [] = .paren;
          context    = value_body
       }
    }
@@ -480,16 +480,16 @@ value_struct_p : context {
 value_struct_tl : context {
    : inline_push {
       regex    \= (\b$${__SIMPLE})(?=\s*[$${__LBRACK}])
-      styles [] = .type ;
-      
+      styles [] = .type;
+
       : pop {
          regex    \= ([$${__RBRACK}])
-         styles [] = .bracket ;
+         styles [] = .bracket;
       }
-      
+
       : push {
          regex     \= ([$${__LBRACK}])
-         styles  [] = .bracket ;
+         styles  [] = .bracket;
          context    = value_body
       }
    }
@@ -498,13 +498,13 @@ value_struct_tl : context {
 value_struct_tb : context {
    : inline_push {
       regex    \= (\b$${__SIMPLE})(?=\s*[$${__LBRACE}])
-      styles [] = .type ;
-      
+      styles [] = .type;
+
       : pop {
          regex    \= ([$${__RBRACE}])
-         styles [] = .punctuation ;
+         styles [] = .punctuation;
       }
-      
+
       : include "struct_body" ;
    }
 }
@@ -535,52 +535,52 @@ literals : context {
 literal : context {
    : pattern {
       regex    \= (?=\S)(?!$${__SIMPLE}\s*[$${__LMAJOR}])(?:$${__KEYWORDS}|($${__MID_LITERAL}+))
-      styles [] = .keyword, .literal ;
+      styles [] = .keyword, .literal;
    }
 }
 
 math_body : context {
    : pattern {
       regex    \= ((?:[$${__DOLLAR}]{2}|[$${__ZERO}]x)$${__HEXNUM})
-      styles [] = .hexadecimal ;
+      styles [] = .hexadecimal;
    }
    : pattern {
       regex    \= ([$${__ZERO}]o[$${__OCTAL}]+)
-      styles [] = .octal ;
+      styles [] = .octal;
    }
    : pattern {
       regex    \= ((?:$${__ZERO}b|$${__PERCENT})[$${__BINARY}]+)
-      styles [] = .binary ;
+      styles [] = .binary;
    }
    : pattern {
       regex    \= ([$${__DECIMAL}]+_[$${__DECIMAL}]+)
-      styles [] = .non_decimal ;
+      styles [] = .non_decimal;
    }
    : pattern {
       regex    \= $${__NUMBER}
-      styles [] = .number ;
+      styles [] = .number;
    }
    : include "string_escape" ;
    : pattern {
       regex    \= $${__OPERATOR}
-      styles [] = .operator ;
+      styles [] = .operator;
    }
    : pattern {
       regex    \= ([$${__LANGLE}])|([$${__RANGLE}])
-      styles [] = .angle.begin, .angle.end ;
+      styles [] = .angle.begin, .angle.end;
    }
 }
 
 math_literal : context {
    : inline_push {
       regex    \= ([$${__PLUS}])
-      styles [] = .operator ;
-      
+      styles [] = .operator;
+
       : pop {
          regex    \= (?!$${__MID_LITERAL})|(?=$)
-         styles [] = ;
+         styles [] =;
       }
-      
+
       : include "math_body" ;
    }
 }
@@ -588,17 +588,17 @@ math_literal : context {
 math_quoted1 : context {
    : inline_push {
       regex    \= ([$${__GRAVE}])([$${__PLUS}])
-      styles [] = .string.begin, .operator ;
-      
+      styles [] = .string.begin, .operator;
+
       : pop {
          regex    \= ([$${__GRAVE}])
-         styles [] = .string.end ;
+         styles [] = .string.end;
       }
-      
+
       : include "math_body" ;
       : pattern {
          regex    \= ([$${__LPAREN}$${__RPAREN}])
-         styles [] = .paren ;
+         styles [] = .paren;
       }
    }
 }
@@ -606,17 +606,17 @@ math_quoted1 : context {
 math_quoted3 : context {
    : inline_push {
       regex    \= ([$${__GRAVE}]{3})([$${__PLUS}])
-      styles [] = .string.begin, .operator ;
-      
+      styles [] = .string.begin, .operator;
+
       : pop {
          regex    \= ([$${__GRAVE}]{3})
-         styles [] = .string.end ;
+         styles [] = .string.end;
       }
-      
+
       : include "math_body" ;
       : pattern {
          regex    \= ([$${__LPAREN}$${__RPAREN}])
-         styles [] = .paren ;
+         styles [] = .paren;
       }
    }
 }
@@ -624,12 +624,12 @@ math_quoted3 : context {
 math_dash_string : context {
    : inline_push {
       regex        \= $${__DASHQ}([$${__PLUS}])
-      styles []     = .string.begin, .operator ;
+      styles []     = .string.begin, .operator;
       : eol_pop {}
       : include "math_body" ;
       : pattern {
          regex    \= ([$${__LPAREN}$${__RPAREN}])
-         styles [] = .paren ;
+         styles [] = .paren;
       }
    }
 }
@@ -637,16 +637,16 @@ math_dash_string : context {
 refstr : context {
    : inline_push {
       regex         \= ([$${__ATMARK}])(")
-      styles []      = .reference.begin, .string.begin ;
+      styles []      = .reference.begin, .string.begin;
       : pop {
          regex      \= (")|(.$)
-         styles []   = .string.end, .illegal ;
+         styles []   = .string.end, .illegal;
       }
       : include "string_escape" ;
       : include "is_reference" ;
       : pattern {
          regex      \= ([^"$${__DOLLAR}$${__ATMARK}]+(?!$))
-         styles []   = .dquoted_text ;
+         styles []   = .dquoted_text;
       }
    }
 }
@@ -654,15 +654,15 @@ refstr : context {
 string : context {
    : inline_push {
       regex         \= (")
-      styles []      = .string.begin ;
+      styles []      = .string.begin;
       : pop {
          regex      \= (")|(.$)
-         styles []   = .string.end, .illegal ;
+         styles []   = .string.end, .illegal;
       }
       : include "string_escape" ;
       : pattern {
          regex      \= ([^"$${__DOLLAR}]+(?!$))
-         styles []   = .dquoted_text ;
+         styles []   = .dquoted_text;
       }
    }
 }
@@ -670,12 +670,12 @@ string : context {
 dash_string : context {
    : inline_push {
       regex        \= $${__DASHQ}
-      styles []     = .string.begin ;
+      styles []     = .string.begin;
       : eol_pop {}
       : include "string_escape" ;
       : pattern {
          regex      \= ([^$${__DOLLAR}]+)
-         styles []   = .dashed_text ;
+         styles []   = .dashed_text;
       }
    }
 }
@@ -683,13 +683,13 @@ dash_string : context {
 dash_refstring : context {
    : inline_push {
       regex         \= ([$${__ATMARK}])$${__DASHQ}
-      styles []      = .reference.begin, .string.begin ;
+      styles []      = .reference.begin, .string.begin;
       : eol_pop {}
       : include "string_escape" ;
       : include "is_reference" ;
       : pattern {
          regex      \= ([^$${__DOLLAR}$${__ATMARK}]+)
-         styles []   = .dashed_text ;
+         styles []   = .dashed_text;
       }
    }
 }
@@ -702,13 +702,13 @@ dash_refstring : context {
 multistr : context {
    : inline_push {
       regex    \= (?=[$${__GRAVE}])
-      styles [] = .none ;
-      
+      styles [] = .none;
+
       : pop {
          regex    \= ([$${__COMMA}]|^(?=\s*[^$${__HASH}$${__GRAVE}]))
-         styles [] = .comma ;
+         styles [] = .comma;
       }
-      
+
       : include "multistr_block" ;
    }
 }
@@ -724,13 +724,13 @@ multistr_block : context {
 multistr_1 : context {
    : inline_push {
       regex    \= ([$${__GRAVE}](?![$${__GRAVE}]))
-      styles [] = .string.begin ;
-      
+      styles [] = .string.begin;
+
       : pop {
          regex    \= ([$${__GRAVE}])
-         styles [] = .string.end ;
+         styles [] = .string.end;
       }
-      
+
       : include "multistr_inner" ;
    }
 }
@@ -738,13 +738,13 @@ multistr_1 : context {
 multistr_2 : context {
    : inline_push {
       regex    \= ([$${__GRAVE}]{2}(?![$${__GRAVE}]))
-      styles [] = .string.begin ;
-      
+      styles [] = .string.begin;
+
       : pop {
          regex    \= ([$${__GRAVE}]{2})
-         styles [] = .string.end ;
+         styles [] = .string.end;
       }
-      
+
       : include "multistr_inner" ;
    }
 }
@@ -752,13 +752,13 @@ multistr_2 : context {
 multistr_3 : context {
    : inline_push {
       regex    \= ([$${__GRAVE}]{3}(?![$${__GRAVE}]))
-      styles [] = .string.begin ;
-      
+      styles [] = .string.begin;
+
       : pop {
          regex    \= ([$${__GRAVE}]{3})
-         styles [] = .string.end ;
+         styles [] = .string.end;
       }
-      
+
       : include "multistr_inner" ;
    }
 }
@@ -767,7 +767,7 @@ multistr_inner : context {
    : include "string_escape" ;
    : pattern {
       regex    \= ([^$${__GRAVE}$${__DOLLAR}]+)
-      styles [] = .mquoted_text ;
+      styles [] = .mquoted_text;
    }
 }
 
@@ -775,13 +775,13 @@ multistr_inner : context {
 refmultistr : context {
    : inline_push {
       regex    \= (?=[$${__ATMARK}][$${__GRAVE}])
-      styles [] = .none ;
-      
+      styles [] = .none;
+
       : pop {
          regex    \= ([$${__COMMA}]|^(?=\s*(?![$${__HASH}$${__GRAVE}]|[$${__ATMARK}][$${__GRAVE}])))
-         styles [] = .comma ;
+         styles [] = .comma;
       }
-      
+
       : include "refmultistr_block" ;
    }
 }
@@ -796,13 +796,13 @@ refmultistr_block : context {
 refmultistr_1 : context {
    : inline_push {
       regex    \= ([$${__ATMARK}]?)([$${__GRAVE}](?![$${__GRAVE}]))
-      styles [] = .reference.begin, .string.begin ;
-      
+      styles [] = .reference.begin, .string.begin;
+
       : pop {
          regex    \= ([$${__GRAVE}])
-         styles [] = .string.end ;
+         styles [] = .string.end;
       }
-      
+
       : include "refmultistr_inner" ;
    }
 }
@@ -810,13 +810,13 @@ refmultistr_1 : context {
 refmultistr_2 : context {
    : inline_push {
       regex    \= ([$${__ATMARK}]?)([$${__GRAVE}]{2}(?![$${__GRAVE}]))
-      styles [] = .reference.begin, .string.begin ;
-      
+      styles [] = .reference.begin, .string.begin;
+
       : pop {
          regex    \= ([$${__GRAVE}]{2})
-         styles [] = .string.end ;
+         styles [] = .string.end;
       }
-      
+
       : include "refmultistr_inner" ;
    }
 }
@@ -826,7 +826,7 @@ refmultistr_inner : context {
    : include "reference" ;
    : pattern {
       regex    \= ([^$${__GRAVE}$${__DOLLAR}$${__ATMARK}]+)
-      styles [] = .mquoted_text ;
+      styles [] = .mquoted_text;
    }
 }
 
@@ -843,10 +843,10 @@ reference : context {
 reference_paren : context {
    : inline_push {
       regex    \= ([$${__ATMARK}])(\s*)([$${__LPAREN}])
-      styles [] = .reference.begin, .none, .paren ;
+      styles [] = .reference.begin, .none, .paren;
       : pop {
          regex    \= ([$${__RPAREN}])
-         styles [] = .paren ;
+         styles [] = .paren;
       }
       : include "reference_begin" ;
    }
@@ -855,10 +855,10 @@ reference_paren : context {
 reference_brack : context {
    : inline_push {
       regex    \= ([$${__ATMARK}])(\s*)([$${__LBRACK}])
-      styles [] = .reference.begin, .none, .bracket ;
+      styles [] = .reference.begin, .none, .bracket;
       : pop {
          regex    \= ([$${__RBRACK}])
-         styles [] = .bracket ;
+         styles [] = .bracket;
       }
       : include "reference_begin" ;
    }
@@ -867,7 +867,7 @@ reference_brack : context {
 reference_bare : context {
    : push {
       regex    \= ([$${__ATMARK}])(\s*)(?:$${__KEYREFS}|($${__STRUCT_NAME})|)
-      styles [] = .reference.begin, .none, .keyref, .name ;
+      styles [] = .reference.begin, .none, .keyref, .name;
       context   = reference_inner
    }
 }
@@ -875,7 +875,7 @@ reference_bare : context {
 reference_begin : context {
    : push {
       regex    \= (?:$${__KEYREFS}|($${__STRUCT_NAME})|)
-      styles [] = .keyref, .name ;
+      styles [] = .keyref, .name;
       context   = reference_inner
    }
 }
@@ -884,7 +884,7 @@ reference_inner : context {
    space_unimportant = true
    : pop {
       regex    \= (?!$${__SUBSCRIPTP}|[$${__LBRACK}$${__LBRACE}$${__SUBSCRIPT1}\s$${__HASH}])
-      styles [] = ;
+      styles [] =;
    }
    : include "comment" ;
    : include "index" ;
@@ -895,24 +895,29 @@ reference_inner : context {
 index : context {
    : inline_push {
       regex    \= ([$${__LBRACK}])
-      styles [] = .bracket ;
+      styles [] = .bracket;
       : pop {
          regex    \= ([$${__RBRACK}])
-         styles [] = .bracket ;
+         styles [] = .bracket;
       }
       : include "comment" ;
-      : include "numeric" ;
+      : include "strings" ;
       : include "reference" ;
+      : include "numeric" ;
+      : include "literals" ;
+      : include "value_struct_tp" ;
+      : include "value_struct_tl" ;
+      : include "value_struct_tb" ;
    }
 }
 
 subscript : context {
    : inline_push {
       regex    \= ([$${__LBRACE}])
-      styles [] = .punctuation ;
+      styles [] = .punctuation;
       : pop {
          regex    \= ([$${__RBRACE}])
-         styles [] = .punctuation ;
+         styles [] = .punctuation;
       }
       : include "comment" ;
       : include "literal" ;
@@ -922,10 +927,10 @@ subscript : context {
 reference_key : context {
    : inline_push {
       regex    \= ($${__SUBSCRIPTP}|[$${__SUBSCRIPT1}])
-      styles [] = .punctuation ;
+      styles [] = .punctuation;
       : pop {
          regex    \= (\b$${__SIMPLE})
-         styles [] = .key ;
+         styles [] = .key;
       }
       : include "comment" ;
    }
@@ -942,10 +947,10 @@ is_reference : context {
 is_reference_paren : context {
    : inline_push {
       regex    \= ([$${__ATMARK}])([$${__LPAREN}])(\s*)
-      styles [] = .reference.begin, .paren, .none ;
+      styles [] = .reference.begin, .paren, .none;
       : pop {
          regex    \= (?:\s*([$${__RPAREN}])|(?=.?$|[$${__RQUOTE}]))
-         styles [] = .paren ;
+         styles [] = .paren;
       }
       : include "is_reference_begin" ;
    }
@@ -954,10 +959,10 @@ is_reference_paren : context {
 is_reference_brack : context {
    : inline_push {
       regex    \= ([$${__ATMARK}])([$${__LBRACK}])(\s*)
-      styles [] = .reference.begin, .bracket, .none ;
+      styles [] = .reference.begin, .bracket, .none;
       : pop {
          regex    \= (?:\s*([$${__RBRACK}])|(?=.?$|[$${__RQUOTE}]))
-         styles [] = .bracket ;
+         styles [] = .bracket;
       }
       : include "is_reference_begin" ;
    }
@@ -966,7 +971,7 @@ is_reference_brack : context {
 is_reference_bare : context {
    : push {
       regex    \= ([$${__ATMARK}])($${__STRUCT_NAME}|)
-      styles [] = .reference.begin, .name ;
+      styles [] = .reference.begin, .name;
       context   = is_reference_inner
    }
 }
@@ -974,7 +979,7 @@ is_reference_bare : context {
 is_reference_begin : context {
    : push {
       regex    \= ($${__STRUCT_NAME}|)
-      styles [] = .name ;
+      styles [] = .name;
       context   = is_reference_inner
    }
 }
@@ -982,7 +987,7 @@ is_reference_begin : context {
 is_reference_inner : context {
    : pop {
       regex    \= (?!$${__SUBSCRIPTP}|[$${__LBRACK}$${__LBRACE}$${__SUBSCRIPT1}])
-      styles [] = ;
+      styles [] =;
    }
    : include "is_index" ;
    : include "is_subscript" ;
@@ -991,24 +996,28 @@ is_reference_inner : context {
 
 is_index : context {
    : inline_push {
-      regex    \= ([$${__LBRACK}])
-      styles [] = .bracket ;
+      regex    \= ([$${__LBRACK}](?=[$${__RQUOTE}]))|([$${__LBRACK}])
+      styles [] = .illegal, .bracket;
       : pop {
-         regex    \= ([$${__RBRACK}]|(?=.$|[$${__RQUOTE}]))
-         styles [] = .bracket ;
+         regex    \= ([$${__RBRACK}])|(?=.$)|(.(?=[$${__RQUOTE}]))
+         styles [] = .bracket, .illegal;
       }
+      : include "reference" ;
       : include "numeric" ;
-      : include "is_reference" ;
+      : include "literals" ;
+      : include "value_struct_tp" ;
+      : include "value_struct_tl" ;
+      : include "value_struct_tb" ;
    }
 }
 
 is_subscript : context {
    : inline_push {
-      regex    \= ([$${__LBRACE}])
-      styles [] = .punctuation ;
+      regex    \= ([$${__LBRACE}](?=[$${__RQUOTE}]))|([$${__LBRACE}])
+      styles [] = .illegal, .punctuation;
       : pop {
-         regex    \= ([$${__RBRACE}]|(?=.$|[$${__RQUOTE}]))
-         styles [] = .punctuation ;
+         regex    \= ([$${__RBRACE}])|(?=.$)|(.(?=[$${__RQUOTE}]))
+         styles [] = .punctuation, .illegal;
       }
       : include "literal" ;
    }
@@ -1017,8 +1026,8 @@ is_subscript : context {
 is_reference_key : context {
    : pattern {
       regex    \= ($${__SUBSCRIPTP}|[$${__SUBSCRIPT1}])($${__SIMPLE})
-      styles [] = .punctuation, .key ;
+      styles [] = .punctuation, .key;
    }
 }
-   
+
 }
