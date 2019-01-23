@@ -5,7 +5,7 @@
 ################################################################
 
 name                   = rpl
-file_extensions []     = rpl ;
+file_extensions []     = rpl;
 
 ################################################################
 ## Constants
@@ -514,10 +514,9 @@ value_struct_tb : context {
 ## Strings
 ###########################################
 
-# TODO: j2
 strings : context {
-   : include "refstr" ;
-   : include "string" ;
+   : include "refstr_all" ;
+   : include "string_all" ;
    : include "dash_refstring" ;
    : include "math_dash_string" ;
    : include "dash_string" ;
@@ -634,37 +633,78 @@ math_dash_string : context {
    }
 }
 
-refstr : context {
+// ~~DEL~~ {% if ascii %}{% set lqs = quotes.ascii %}
+// ~~DEL~~ {% else %}{% set lqs = quotes.lquotes %}
+// ~~DEL~~ {% endif %}
+refstr_all : context {
+   // ~~DEL~~ {% for lq in lqs %}{% with %}
+   // ~~DEL~~ {% set rqs = quotes.match[lq] %}
    : inline_push {
+      /* ~~DEL NEXT~~ {#*///#}
       regex         \= ([$${__ATMARK}])(")
+      /*/// ~~DEL~~
+      regex         \= ([$${__ATMARK}])({{ lq|safe }})
+      // ~~DEL~~ */
       styles []      = .reference.begin, .string.begin;
       : pop {
+         /* ~~DEL NEXT~~ {#*///#}
          regex      \= (")|(.$)
+         /*/// ~~DEL~~
+         regex      \= ([{{ rqs|safe }}])|(.$)
+         // ~~DEL~~ */
          styles []   = .string.end, .illegal;
       }
       : include "string_escape" ;
       : include "is_reference" ;
       : pattern {
+         /* ~~DEL NEXT~~ {#*///#}
          regex      \= ([^"$${__DOLLAR}$${__ATMARK}]+(?!$))
+         /*/// ~~DEL~~
+         regex      \= ([^{{ rqs|safe }}$${__DOLLAR}$${__ATMARK}]+(?!$))
+         // ~~DEL~~ */
+         // ~~DEL~~ {% if lq in quotes.ldouble %}
          styles []   = .dquoted_text;
+         /* ~~DEL~~ {% else %}
+         styles []   = .squoted_text;
+         // ~~DEL~~ {% endif %}*/
       }
    }
+   // ~~DEL~~ {% endwith %}{% endfor %}
 }
 
-string : context {
+string_all : context {
+   // ~~DEL~~ {% for lq in lqs %}{% with %}
+   // ~~DEL~~ {% set rqs = quotes.match[lq] %}
    : inline_push {
+      /* ~~DEL NEXT~~ {#*///#}
       regex         \= (")
+      /*/// ~~DEL~~
+      regex         \= ({{ lq|safe }})
+      // ~~DEL~~ */
       styles []      = .string.begin;
       : pop {
+         /* ~~DEL NEXT~~ {#*///#}
          regex      \= (")|(.$)
+         /*/// ~~DEL~~
+         regex      \= ([{{ rqs|safe }}])|(.$)
+         // ~~DEL~~ */
          styles []   = .string.end, .illegal;
       }
       : include "string_escape" ;
       : pattern {
+         /* ~~DEL NEXT~~ {#*///#}
          regex      \= ([^"$${__DOLLAR}]+(?!$))
+         /*/// ~~DEL~~
+         regex      \= ([^{{ rqs|safe }}$${__DOLLAR}]+(?!$))
+         // ~~DEL~~ */
+         // ~~DEL~~ {% if lq in quotes.ldouble %}
          styles []   = .dquoted_text;
+         /* ~~DEL~~ {% else %}
+         styles []   = .squoted_text;
+         // ~~DEL~~ {% endif %}*/
       }
    }
+   // ~~DEL~~ {% endwith %}{% endfor %}
 }
 
 dash_string : context {
@@ -715,12 +755,15 @@ multistr : context {
 
 multistr_block : context {
    : include "comment" ;
-   : include "multistr_3" ;
-   : include "multistr_2" ;
+   // ~~DEL~~ {#
    : include "multistr_1" ;
+   /* #}
+   // ~~DEL~~ {% for i in range(multi, 0, -1) %}
+   : include "multistr_{{ i }}" ;
+   // ~~DEL~~ {% endfor %}
+   {# */// #}// ~~DEL~~
 }
 
-# TODO: j2
 multistr_1 : context {
    : inline_push {
       regex    \= ([$${__GRAVE}](?![$${__GRAVE}]))
@@ -735,33 +778,21 @@ multistr_1 : context {
    }
 }
 
-multistr_2 : context {
+/* ~~DEL~~ *{# #}/{% for i in range(2, multi+1) %}
+multistr_{{ i }} : context {
    : inline_push {
-      regex    \= ([$${__GRAVE}]{2}(?![$${__GRAVE}]))
+      regex    \= ([$${__GRAVE}]{ {{ i }} }(?![$${__GRAVE}]))
       styles [] = .string.begin;
 
       : pop {
-         regex    \= ([$${__GRAVE}]{2})
+         regex    \= ([$${__GRAVE}]{ {{ i }} })
          styles [] = .string.end;
       }
 
       : include "multistr_inner" ;
    }
 }
-
-multistr_3 : context {
-   : inline_push {
-      regex    \= ([$${__GRAVE}]{3}(?![$${__GRAVE}]))
-      styles [] = .string.begin;
-
-      : pop {
-         regex    \= ([$${__GRAVE}]{3})
-         styles [] = .string.end;
-      }
-
-      : include "multistr_inner" ;
-   }
-}
+{% endfor %}// ~~DEL~~ */
 
 multistr_inner : context {
    : include "string_escape" ;
@@ -788,11 +819,15 @@ refmultistr : context {
 
 refmultistr_block : context {
    : include "comment" ;
-   : include "refmultistr_2" ;
+   // ~~DEL~~ {#
    : include "refmultistr_1" ;
+   /* #} 
+   // ~~DEL~~ {% for i in range(multi, 0, -1) %}
+   : include "refmultistr_{{ i }}" ;
+   // ~~DEL~~ {% endfor %}
+   {# */// #}// ~~DEL~~
 }
 
-# TODO: j2
 refmultistr_1 : context {
    : inline_push {
       regex    \= ([$${__ATMARK}]?)([$${__GRAVE}](?![$${__GRAVE}]))
@@ -807,19 +842,21 @@ refmultistr_1 : context {
    }
 }
 
-refmultistr_2 : context {
+/* ~~DEL~~ *{# #}/{% for i in range(2, multi+1) %}
+refmultistr_{{ i }} : context {
    : inline_push {
-      regex    \= ([$${__ATMARK}]?)([$${__GRAVE}]{2}(?![$${__GRAVE}]))
+      regex    \= ([$${__ATMARK}]?)([$${__GRAVE}]{ {{ i }} }(?![$${__GRAVE}]))
       styles [] = .reference.begin, .string.begin;
 
       : pop {
-         regex    \= ([$${__GRAVE}]{2})
+         regex    \= ([$${__GRAVE}]{ {{ i }} })
          styles [] = .string.end;
       }
 
       : include "refmultistr_inner" ;
    }
 }
+{% endfor %}// ~~DEL~~ */
 
 refmultistr_inner : context {
    : include "string_escape" ;
