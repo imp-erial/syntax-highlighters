@@ -1,0 +1,1890 @@
+%YAML 1.2
+---
+name: rpl
+scope: source.rpl
+file_extensions: [ rpl ]
+
+contexts:
+  main:
+    - include: comment
+    - include: strings
+    - include: reference
+    - include: range
+    - include: numeric
+    - include: list
+    - include: concat
+    - include: struct_type
+    - include: struct_name
+    - include: struct_body
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  value_body:
+    - match: '([\x{002c}]|(?=[\)\]\}]))'
+      pop: true
+      captures:
+        0: meta.delimiter.object.comma.rpl
+    - include: comment
+    - include: strings
+    - include: reference
+    - include: range
+    - include: numeric
+    - include: list
+    - include: concat
+    - include: literals
+    - include: value_struct_tp
+    - include: value_struct_tl
+    - include: value_struct_tb
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  key_value_body:
+    - match: '([\x{002c}]|(?=[\}])|^(?=\s*[^\s\x{003a}\(\[\{]))'
+      pop: true
+      captures:
+        0: meta.delimiter.object.comma.rpl
+    - include: comment
+    - include: strings
+    - include: reference
+    - include: range
+    - include: numeric
+    - include: list
+    - include: concat
+    - include: literals
+    - include: value_struct_tp
+    - include: value_struct_tl
+    - include: value_struct_tb
+    - include: value_struct_p
+    - include: struct_body
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  struct_body:
+    - match: '([\{])'
+      captures:
+        0: punctuation.rpl
+      push: 
+        - match: '([\}])'
+          pop: true
+          captures:
+            0: punctuation.rpl
+        - include: comment
+        - match: '([\x{003a}])'
+          push: key_value_body
+          captures:
+            0: support.variable.rpl
+        - include: comment
+        - include: strings
+        - include: reference
+        - include: range
+        - include: numeric
+        - match: '(\b[a-z][a-z\d]*\s*[\x{003a}])'
+          push: key_value_body
+          captures:
+            0: support.variable.rpl
+        - include: list
+        - include: struct_type
+        - include: struct_name
+        - include: struct_body
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  list:
+    - match: '([\[])'
+      captures:
+        0: punctuation.rpl
+      push: 
+        - match: '([\]])'
+          pop: true
+          captures:
+            0: punctuation.rpl
+        - match: '(?=.)'
+          push: value_body
+          captures:
+            0: none.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  comment:
+    - match: '([\x{0023}]+)(.*$)'
+      captures:
+        0: punctuation.definition.comment.rpl
+        1: comment.line.number-sign.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  numeric:
+    - match: '(?:(\b\d+)|([\$][\da-fA-F]+))(?=\s*[\x{003a}\x{002c}\x{0023}\)\]\}]|\s*$)'
+      captures:
+        0: constant.numeric.integer.decimal.rpl
+        1: constant.numeric.integer.non-decimal.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  string_escape:
+    - match: '([\$](?:[\da-fA-F]{2}|\([\da-fA-F]*\)|[\x{0022}\x{0027}\x{0060}znrt\$\x{0040}]))|([\$].)'
+      captures:
+        0: constant.character.escape.rpl
+        1: invalid.illegal.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  range:
+    - match: '(?:(\b\d+)|([\$][\da-fA-F]+))(\s*)([-\x{007e}\x{002a}\x{002b}\x{00b1}]|\+-)(\s*)(?:(\b\d+)|([\$][\da-fA-F]+))'
+      captures:
+        0: constant.numeric.integer.decimal.rpl
+        1: constant.numeric.integer.hexadecimal.rpl
+        2: none.rpl
+        3: keyword.operator.range.rpl
+        4: none.rpl
+        5: constant.numeric.integer.decimal.rpl
+        6: constant.numeric.integer.hexadecimal.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  concat:
+    - match: '([\x{003a}])(\1?)'
+      captures:
+        0: punctuation.rpl
+        1: punctuation.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  struct_type:
+    - match: '(ROM|RPL|rom|rpl)|(\b[a-z][a-z\d]*)'
+      captures:
+        0: keyword.rpl
+        1: storage.type.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  struct_name:
+    - match: '(\b[\w_\d]+)'
+      captures:
+        0: entity.name.type.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  value_struct_tp:
+    - match: '(\b[a-z][a-z\d]*)(?=\s*[\(])'
+      captures:
+        0: storage.type.rpl
+      push: 
+        - match: '([\)])'
+          pop: true
+          captures:
+            0: meta.brace.round.rpl.rpl
+        - match: '([\(])'
+          push: value_body
+          captures:
+            0: meta.brace.round.rpl.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  value_struct_p:
+    - match: '(?=[\(])'
+      captures:
+        0: storage.type.rpl
+      push: 
+        - match: '([\)])'
+          pop: true
+          captures:
+            0: meta.brace.round.rpl.rpl
+        - match: '([\(])'
+          push: value_body
+          captures:
+            0: meta.brace.round.rpl.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  value_struct_tl:
+    - match: '(\b[a-z][a-z\d]*)(?=\s*[\[])'
+      captures:
+        0: storage.type.rpl
+      push: 
+        - match: '([\]])'
+          pop: true
+          captures:
+            0: meta.brace.square.rpl.rpl
+        - match: '([\[])'
+          push: value_body
+          captures:
+            0: meta.brace.square.rpl.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  value_struct_tb:
+    - match: '(\b[a-z][a-z\d]*)(?=\s*[\{])'
+      captures:
+        0: storage.type.rpl
+      push: 
+        - match: '([\}])'
+          pop: true
+          captures:
+            0: punctuation.rpl
+        - include: struct_body
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  strings:
+    - include: refstr_all
+    - include: string_all
+    - include: dash_refstring
+    - include: math_dash_string
+    - include: dash_string
+    - include: refmultistr
+    - include: math_quoted3
+    - include: math_quoted1
+    - include: multistr
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  literals:
+    - include: math_literal
+    - include: literal
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  literal:
+    - match: '(?=\S)(?![a-z][a-z\d]*\s*[\(\[\{])(?:(false|true|undefined|black|white|red|blue|green|yellow|magenta|pink|cyan|gray|grey|transparent|byte|short|long|double|LRUD|LRDU|RLUD|RLDU|UDLR|UDRL|DULR|DURL|LU|LD|RU|RD|UL|UR|DL|DR|big|little|(?:un)?signed|left|right|r?center|l?both|expand|\*)|([^\x{003a}\x{002c}\x{0023}\(\[\{\)\]\}]+))'
+      captures:
+        0: keyword.rpl
+        1: text.unquoted.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  math_body:
+    - match: '((?:[\$]{2}|[0]x)[\da-fA-F]+)'
+      captures:
+        0: constant.numeric.integer.hexadecimal.rpl
+    - match: '([0]o[0-7]+)'
+      captures:
+        0: constant.numeric.integer.octal.rpl
+    - match: '((?:0b|%)[01]+)'
+      captures:
+        0: constant.numeric.integer.binary.rpl
+    - match: '([\d]+_[\d]+)'
+      captures:
+        0: constant.numeric.integer.non-decimal.rpl
+    - match: '(\b\d+)'
+      captures:
+        0: constant.numeric.integer.decimal.rpl
+    - include: string_escape
+    - match: '(\*\*|<<|>>|[-\x{002b}\x{002a}\x{002f}\x{0026}\x{007c}\x{005e}\x{0025}])'
+      captures:
+        0: keyword.operator.rpl
+    - match: '([\x{003c}])|([\x{003e}])'
+      captures:
+        0: punctuation.definition.generic.begin.rpl
+        1: punctuation.definition.generic.end.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  math_literal:
+    - match: '([\+])'
+      captures:
+        0: keyword.operator.rpl
+      push: 
+        - match: '(?![^\x{003a}\x{002c}\x{0023}\(\[\{\)\]\}])|(?=$)'
+          pop: true
+          captures:
+        - include: math_body
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  math_quoted1:
+    - match: '([\x{0060}])([\+])'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+        1: keyword.operator.rpl
+      push: 
+        - match: '([\x{0060}])'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+        - include: math_body
+        - match: '([\(\)])'
+          captures:
+            0: meta.brace.round.rpl.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  math_quoted3:
+    - match: '([\x{0060}]{3})([\+])'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+        1: keyword.operator.rpl
+      push: 
+        - match: '([\x{0060}]{3})'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+        - include: math_body
+        - match: '([\(\)])'
+          captures:
+            0: meta.brace.round.rpl.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  math_dash_string:
+    - match: '(--|[\x{2013}\x{2014}\x{2015}])([\+])'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+        1: keyword.operator.rpl
+      push: 
+        - match: '(^(?=.{0,1})(?:|))'
+          pop: true
+          captures:
+            0: comment.line.number-sign.rpl
+        - include: math_body
+        - match: '([\(\)])'
+          captures:
+            0: meta.brace.round.rpl.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  refstr_all:
+    - match: '([\x{0040}])('')'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{0027}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{0027}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{ff07})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{ff07}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{ff07}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{2018})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{2018}\x{2019}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{2018}\x{2019}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{2019})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{2019}\x{2018}\x{201a}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{2019}\x{2018}\x{201a}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{275b})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{275b}\x{275c}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{275b}\x{275c}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{275c})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{275c}\x{275b}\x{275f}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{275c}\x{275b}\x{275f}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{201b})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{201b}\x{2019}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{201b}\x{2019}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{300c})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{300d}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{300d}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{3008})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{3009}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{3009}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{201a})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{2019}\x{2018}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{2019}\x{2018}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{275f})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{275c}\x{275b}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{275c}\x{275b}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{2039})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{203a}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{203a}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{203a})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{2039}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{2039}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{276e})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{276f}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{276f}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{276f})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{276e}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{276e}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(")'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{0022}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{0022}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{ff02})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{ff02}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{ff02}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{201c})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{201c}\x{201d}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{201c}\x{201d}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{201d})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{201d}\x{201e}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{201d}\x{201e}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{275d})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{275d}\x{275e}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{275d}\x{275e}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{275e})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{275e}\x{2760}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{275e}\x{2760}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\u{s1:4x}\u{s2:4x})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\u{s1:4x}\u{s2:4x})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{201f})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{201f}\x{201d}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{201f}\x{201d}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{300e})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{300f}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{300f}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{300a})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{300b}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{300b}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{201e})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{201c}\x{201d}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{201c}\x{201d}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\x{2760})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{275d}\x{275e}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\x{275d}\x{275e}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\u{s1:4x}\u{s2:4x})'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\u  ab)'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\u\x{0020}\x{0020}bb])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\u\x{0020}\x{0020}bb\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '([\x{0040}])(\u  bb)'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\u\x{0020}\x{0020}ab\u\x{0020}\x{0020}bb])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\u\x{0020}\x{0020}ab\u\x{0020}\x{0020}bb\$\x{0040}]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  string_all:
+    - match: '('')'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{0027}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{0027}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{ff07})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{ff07}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{ff07}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{2018})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{2018}\x{2019}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{2018}\x{2019}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{2019})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{2019}\x{2018}\x{201a}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{2019}\x{2018}\x{201a}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{275b})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{275b}\x{275c}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{275b}\x{275c}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{275c})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{275c}\x{275b}\x{275f}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{275c}\x{275b}\x{275f}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{201b})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{201b}\x{2019}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{201b}\x{2019}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{300c})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{300d}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{300d}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{3008})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{3009}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{3009}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{201a})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{2019}\x{2018}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{2019}\x{2018}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{275f})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{275c}\x{275b}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{275c}\x{275b}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{2039})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{203a}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{203a}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{203a})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{2039}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{2039}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{276e})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{276f}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{276f}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{276f})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{276e}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{276e}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(")'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{0022}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{0022}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{ff02})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{ff02}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{ff02}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{201c})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{201c}\x{201d}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{201c}\x{201d}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{201d})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{201d}\x{201e}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{201d}\x{201e}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{275d})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{275d}\x{275e}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{275d}\x{275e}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{275e})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{275e}\x{2760}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{275e}\x{2760}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\u{s1:4x}\u{s2:4x})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\u{s1:4x}\u{s2:4x})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{201f})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{201f}\x{201d}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{201f}\x{201d}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{300e})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{300f}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{300f}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{300a})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{300b}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{300b}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{201e})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{201c}\x{201d}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{201c}\x{201d}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\x{2760})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{275d}\x{275e}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\x{275d}\x{275e}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\u{s1:4x}\u{s2:4x})'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\u\x{007b}s1\x{003a}4x\x{007d}\u\x{007b}s2\x{003a}4x\x{007d}\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\u  ab)'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\u\x{0020}\x{0020}bb])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\u\x{0020}\x{0020}bb\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(\u  bb)'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\u\x{0020}\x{0020}ab\u\x{0020}\x{0020}bb])|(.$)'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+            1: invalid.illegal.rpl
+        - include: string_escape
+        - match: '([^\u\x{0020}\x{0020}ab\u\x{0020}\x{0020}bb\$]+(?!$))'
+          captures:
+            0: string.quoted.single.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  dash_string:
+    - match: '(--|[\x{2013}\x{2014}\x{2015}])'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '(^(?=.{0,1})(?:|))'
+          pop: true
+          captures:
+            0: comment.line.number-sign.rpl
+        - include: string_escape
+        - match: '([^\$]+)'
+          captures:
+            0: string.quoted.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  dash_refstring:
+    - match: '([\x{0040}])(--|[\x{2013}\x{2014}\x{2015}])'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '(^(?=.{0,1})(?:|))'
+          pop: true
+          captures:
+            0: comment.line.number-sign.rpl
+        - include: string_escape
+        - include: is_reference
+        - match: '([^\$\x{0040}]+)'
+          captures:
+            0: string.quoted.rpl
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  multistr:
+    - match: '(?=[\x{0060}])'
+      captures:
+        0: none.rpl
+      push: 
+        - match: '([\x{002c}]|^(?=\s*[^\x{0023}\x{0060}]))'
+          pop: true
+          captures:
+            0: meta.delimiter.object.comma.rpl
+        - include: multistr_block
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  multistr_block:
+    - include: comment
+    - include: multistr_3
+    - include: multistr_2
+    - include: multistr_1
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  multistr_1:
+    - match: '([\x{0060}](?![\x{0060}]))'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{0060}])'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+        - include: multistr_inner
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  multistr_2:
+    - match: '([\x{0060}]{ 2 }(?![\x{0060}]))'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{0060}]{ 2 })'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+        - include: multistr_inner
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  multistr_3:
+    - match: '([\x{0060}]{ 3 }(?![\x{0060}]))'
+      captures:
+        0: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{0060}]{ 3 })'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+        - include: multistr_inner
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  multistr_inner:
+    - include: string_escape
+    - match: '([^\x{0060}\$]+)'
+      captures:
+        0: string.quoted.single.block.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  refmultistr:
+    - match: '(?=[\x{0040}][\x{0060}])'
+      captures:
+        0: none.rpl
+      push: 
+        - match: '([\x{002c}]|^(?=\s*(?![\x{0023}\x{0060}]|[\x{0040}][\x{0060}])))'
+          pop: true
+          captures:
+            0: meta.delimiter.object.comma.rpl
+        - include: refmultistr_block
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  refmultistr_block:
+    - include: comment
+    - include: refmultistr_3
+    - include: refmultistr_2
+    - include: refmultistr_1
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  refmultistr_1:
+    - match: '([\x{0040}]?)([\x{0060}](?![\x{0060}]))'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{0060}])'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+        - include: refmultistr_inner
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  refmultistr_2:
+    - match: '([\x{0040}]?)([\x{0060}]{ 2 }(?![\x{0060}]))'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{0060}]{ 2 })'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+        - include: refmultistr_inner
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  refmultistr_3:
+    - match: '([\x{0040}]?)([\x{0060}]{ 3 }(?![\x{0060}]))'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: punctuation.definition.string.begin.rpl
+      push: 
+        - match: '([\x{0060}]{ 3 })'
+          pop: true
+          captures:
+            0: punctuation.definition.string.end.rpl
+        - include: refmultistr_inner
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  refmultistr_inner:
+    - include: string_escape
+    - include: reference
+    - match: '([^\x{0060}\$\x{0040}]+)'
+      captures:
+        0: string.quoted.single.block.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  reference:
+    - include: reference_paren
+    - include: reference_brack
+    - include: reference_bare
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  reference_paren:
+    - match: '([\x{0040}])(\s*)([\(])'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: none.rpl
+        2: meta.brace.round.rpl.rpl
+      push: 
+        - match: '([\)])'
+          pop: true
+          captures:
+            0: meta.brace.round.rpl.rpl
+        - include: reference_begin
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  reference_brack:
+    - match: '([\x{0040}])(\s*)([\[])'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: none.rpl
+        2: meta.brace.square.rpl.rpl
+      push: 
+        - match: '([\]])'
+          pop: true
+          captures:
+            0: meta.brace.square.rpl.rpl
+        - include: reference_begin
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  reference_bare:
+    - match: '([\x{0040}])(\s*)(?:(this|g*parent|w*back|Defs)|([\w_\d]+)|)'
+      push: reference_inner
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: none.rpl
+        2: variable.language.rpl
+        3: entity.name.type.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  reference_begin:
+    - match: '(?:(this|g*parent|w*back|Defs)|([\w_\d]+)|)'
+      push: reference_inner
+      captures:
+        0: variable.language.rpl
+        1: entity.name.type.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  reference_inner:
+    - match: '(?!->|[\[\{.\-\x{2500}\s\x{0023}])'
+      pop: true
+      captures:
+    - include: comment
+    - include: index
+    - include: subscript
+    - include: reference_key
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  index:
+    - match: '([\[])'
+      captures:
+        0: meta.brace.square.rpl.rpl
+      push: 
+        - match: '([\]])'
+          pop: true
+          captures:
+            0: meta.brace.square.rpl.rpl
+        - include: comment
+        - include: strings
+        - include: reference
+        - include: numeric
+        - include: literals
+        - include: value_struct_tp
+        - include: value_struct_tl
+        - include: value_struct_tb
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  subscript:
+    - match: '([\{])'
+      captures:
+        0: punctuation.rpl
+      push: 
+        - match: '([\}])'
+          pop: true
+          captures:
+            0: punctuation.rpl
+        - include: comment
+        - include: literal
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  reference_key:
+    - match: '(->|[.\-\x{2500}])'
+      captures:
+        0: punctuation.rpl
+      push: 
+        - match: '(\b[a-z][a-z\d]*)'
+          pop: true
+          captures:
+            0: support.variable.rpl
+        - include: comment
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  is_reference:
+    - include: is_reference_paren
+    - include: is_reference_brack
+    - include: is_reference_bare
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  is_reference_paren:
+    - match: '([\x{0040}])([\(])(\s*)'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: meta.brace.round.rpl.rpl
+        2: none.rpl
+      push: 
+        - match: '(?:\s*([\)])|(?=.?$|[\x{0022}\x{0027}]))'
+          pop: true
+          captures:
+            0: meta.brace.round.rpl.rpl
+        - include: is_reference_begin
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  is_reference_brack:
+    - match: '([\x{0040}])([\[])(\s*)'
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: meta.brace.square.rpl.rpl
+        2: none.rpl
+      push: 
+        - match: '(?:\s*([\]])|(?=.?$|[\x{0022}\x{0027}]))'
+          pop: true
+          captures:
+            0: meta.brace.square.rpl.rpl
+        - include: is_reference_begin
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  is_reference_bare:
+    - match: '([\x{0040}])([\w_\d]+|)'
+      push: is_reference_inner
+      captures:
+        0: punctuation.definition.mapping.begin.rpl
+        1: entity.name.type.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  is_reference_begin:
+    - match: '([\w_\d]+|)'
+      push: is_reference_inner
+      captures:
+        0: entity.name.type.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  is_reference_inner:
+    - match: '(?!->|[\[\{.\-\x{2500}])'
+      pop: true
+      captures:
+    - include: is_index
+    - include: is_subscript
+    - include: is_reference_key
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  is_index:
+    - match: '([\[](?=[\x{0022}\x{0027}]))|([\[])'
+      captures:
+        0: invalid.illegal.rpl
+        1: meta.brace.square.rpl.rpl
+      push: 
+        - match: '([\]])|(?=.$)|(.(?=[\x{0022}\x{0027}]))'
+          pop: true
+          captures:
+            0: meta.brace.square.rpl.rpl
+            1: invalid.illegal.rpl
+        - include: reference
+        - include: numeric
+        - include: literals
+        - include: value_struct_tp
+        - include: value_struct_tl
+        - include: value_struct_tb
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  is_subscript:
+    - match: '([\{](?=[\x{0022}\x{0027}]))|([\{])'
+      captures:
+        0: invalid.illegal.rpl
+        1: punctuation.rpl
+      push: 
+        - match: '([\}])|(?=.$)|(.(?=[\x{0022}\x{0027}]))'
+          pop: true
+          captures:
+            0: punctuation.rpl
+            1: invalid.illegal.rpl
+        - include: literal
+        - match: '(.)'
+          captures:
+            0: text.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
+  is_reference_key:
+    - match: '(->|[.\-\x{2500}])([a-z][a-z\d]*)'
+      captures:
+        0: punctuation.rpl
+        1: support.variable.rpl
+    - match: '(.)'
+      captures:
+        0: text.rpl
