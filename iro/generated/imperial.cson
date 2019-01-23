@@ -1,0 +1,3915 @@
+'fileTypes' : [
+  'rpl'
+]
+'name' : 'rpl'
+'patterns' : [
+  {
+    'include' : '#main'
+  }
+]
+'scopeName' : 'source.rpl'
+'uuid' : ''
+'repository' : {
+  'main' : {
+    'patterns' : [
+      {
+        'include' : '#comment'
+      }
+      {
+        'include' : '#strings'
+      }
+      {
+        'include' : '#reference'
+      }
+      {
+        'include' : '#range'
+      }
+      {
+        'include' : '#numeric'
+      }
+      {
+        'include' : '#list'
+      }
+      {
+        'include' : '#concat'
+      }
+      {
+        'include' : '#struct_type'
+      }
+      {
+        'include' : '#struct_name'
+      }
+      {
+        'include' : '#struct_body'
+      }
+    ]
+  }
+  'comment' : {
+    'patterns' : [
+      {
+        'match' : '([\\x{0023}]+)(.*$)'
+        'captures' : {
+          '1' : {
+            'name' : 'punctuation.definition.comment.rpl'
+          }
+          '2' : {
+            'name' : 'comment.line.number-sign.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'concat' : {
+    'patterns' : [
+      {
+        'match' : '([\\x{003a}])(\\1?)'
+        'captures' : {
+          '1' : {
+            'name' : 'punctuation.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'dash_refstring' : {
+    'patterns' : [
+      {
+        'begin' : '([\\x{0040}])(--|[\\x{2013}\\x{2014}\\x{2015}])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#dash_refstring__1'
+          }
+        ]
+        'end' : '(^(?=.{0,1})(?:|))'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'comment.line.number-sign.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'dash_refstring__1' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\$\\x{0040}]+)'
+        'name' : 'string.quoted.rpl'
+      }
+    ]
+  }
+  'dash_string' : {
+    'patterns' : [
+      {
+        'begin' : '(--|[\\x{2013}\\x{2014}\\x{2015}])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#dash_string__1'
+          }
+        ]
+        'end' : '(^(?=.{0,1})(?:|))'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'comment.line.number-sign.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'dash_string__1' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\$]+)'
+        'name' : 'string.quoted.rpl'
+      }
+    ]
+  }
+  'index' : {
+    'patterns' : [
+      {
+        'begin' : '([\\[])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'meta.brace.square.rpl.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#index__1'
+          }
+        ]
+        'end' : '([\\]])'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.brace.square.rpl.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'index__1' : {
+    'patterns' : [
+      {
+        'include' : '#comment'
+      }
+      {
+        'include' : '#strings'
+      }
+      {
+        'include' : '#reference'
+      }
+      {
+        'include' : '#numeric'
+      }
+      {
+        'include' : '#literals'
+      }
+      {
+        'include' : '#value_struct_tp'
+      }
+      {
+        'include' : '#value_struct_tl'
+      }
+      {
+        'include' : '#value_struct_tb'
+      }
+    ]
+  }
+  'is_index' : {
+    'patterns' : [
+      {
+        'begin' : '([\\[](?=[\\x{0022}\\x{0027}]))|([\\[])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+          '2' : {
+            'name' : 'meta.brace.square.rpl.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#is_index__1'
+          }
+        ]
+        'end' : '([\\]])|(?=.$)|(.(?=[\\x{0022}\\x{0027}]))'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.brace.square.rpl.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'is_index__1' : {
+    'patterns' : [
+      {
+        'include' : '#reference'
+      }
+      {
+        'include' : '#numeric'
+      }
+      {
+        'include' : '#literals'
+      }
+      {
+        'include' : '#value_struct_tp'
+      }
+      {
+        'include' : '#value_struct_tl'
+      }
+      {
+        'include' : '#value_struct_tb'
+      }
+    ]
+  }
+  'is_reference' : {
+    'patterns' : [
+      {
+        'include' : '#is_reference_paren'
+      }
+      {
+        'include' : '#is_reference_brack'
+      }
+      {
+        'include' : '#is_reference_bare'
+      }
+    ]
+  }
+  'is_reference_bare' : {
+    'patterns' : [
+      {
+        'begin' : '([\\x{0040}])([\\w_\\d]+|)'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'entity.name.type.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#is_reference_inner'
+          }
+        ]
+        'end' : '(?!->|[\\[\\{.\\-\\x{2500}])'
+        'endCaptures' : {
+        }
+      }
+    ]
+  }
+  'is_reference_begin' : {
+    'patterns' : [
+      {
+        'begin' : '([\\w_\\d]+|)'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'entity.name.type.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#is_reference_inner'
+          }
+        ]
+        'end' : '(?!->|[\\[\\{.\\-\\x{2500}])'
+        'endCaptures' : {
+        }
+      }
+    ]
+  }
+  'is_reference_brack' : {
+    'patterns' : [
+      {
+        'begin' : '([\\x{0040}])([\\[])(\\s*)'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'meta.brace.square.rpl.rpl'
+          }
+          '3' : {
+            'name' : 'none.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#is_reference_brack__1'
+          }
+        ]
+        'end' : '(?:\\s*([\\]])|(?=.?$|[\\x{0022}\\x{0027}]))'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.brace.square.rpl.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'is_reference_brack__1' : {
+    'patterns' : [
+      {
+        'include' : '#is_reference_begin'
+      }
+    ]
+  }
+  'is_reference_inner' : {
+    'patterns' : [
+      {
+        'include' : '#is_index'
+      }
+      {
+        'include' : '#is_subscript'
+      }
+      {
+        'include' : '#is_reference_key'
+      }
+    ]
+  }
+  'is_reference_key' : {
+    'patterns' : [
+      {
+        'match' : '(->|[.\\-\\x{2500}])([a-z][a-z\\d]*)'
+        'captures' : {
+          '1' : {
+            'name' : 'punctuation.rpl'
+          }
+          '2' : {
+            'name' : 'support.variable.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'is_reference_paren' : {
+    'patterns' : [
+      {
+        'begin' : '([\\x{0040}])([\\(])(\\s*)'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'meta.brace.round.rpl.rpl'
+          }
+          '3' : {
+            'name' : 'none.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#is_reference_paren__1'
+          }
+        ]
+        'end' : '(?:\\s*([\\)])|(?=.?$|[\\x{0022}\\x{0027}]))'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.brace.round.rpl.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'is_reference_paren__1' : {
+    'patterns' : [
+      {
+        'include' : '#is_reference_begin'
+      }
+    ]
+  }
+  'is_subscript' : {
+    'patterns' : [
+      {
+        'begin' : '([\\{](?=[\\x{0022}\\x{0027}]))|([\\{])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#is_subscript__1'
+          }
+        ]
+        'end' : '([\\}])|(?=.$)|(.(?=[\\x{0022}\\x{0027}]))'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'is_subscript__1' : {
+    'patterns' : [
+      {
+        'include' : '#literal'
+      }
+    ]
+  }
+  'key_value_body' : {
+    'patterns' : [
+      {
+        'include' : '#comment'
+      }
+      {
+        'include' : '#strings'
+      }
+      {
+        'include' : '#reference'
+      }
+      {
+        'include' : '#range'
+      }
+      {
+        'include' : '#numeric'
+      }
+      {
+        'include' : '#list'
+      }
+      {
+        'include' : '#concat'
+      }
+      {
+        'include' : '#literals'
+      }
+      {
+        'include' : '#value_struct_tp'
+      }
+      {
+        'include' : '#value_struct_tl'
+      }
+      {
+        'include' : '#value_struct_tb'
+      }
+      {
+        'include' : '#value_struct_p'
+      }
+      {
+        'include' : '#struct_body'
+      }
+    ]
+  }
+  'list' : {
+    'patterns' : [
+      {
+        'begin' : '([\\[])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#list__1'
+          }
+        ]
+        'end' : '([\\]])'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'list__1' : {
+    'patterns' : [
+      {
+        'begin' : '(?=.)'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'none.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#value_body'
+          }
+        ]
+        'end' : '([\\x{002c}]|(?=[\\)\\]\\}]))'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.delimiter.object.comma.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'literal' : {
+    'patterns' : [
+      {
+        'match' : '(?=\\S)(?![a-z][a-z\\d]*\\s*[\\(\\[\\{])(?:(false|true|undefined|black|white|red|blue|green|yellow|magenta|pink|cyan|gray|grey|transparent|byte|short|long|double|LRUD|LRDU|RLUD|RLDU|UDLR|UDRL|DULR|DURL|LU|LD|RU|RD|UL|UR|DL|DR|big|little|(?:un)?signed|left|right|r?center|l?both|expand|\\*)|([^\\x{003a}\\x{002c}\\x{0023}\\(\\[\\{\\)\\]\\}]+))'
+        'captures' : {
+          '1' : {
+            'name' : 'keyword.rpl'
+          }
+          '2' : {
+            'name' : 'text.unquoted.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'literals' : {
+    'patterns' : [
+      {
+        'include' : '#math_literal'
+      }
+      {
+        'include' : '#literal'
+      }
+    ]
+  }
+  'math_body' : {
+    'patterns' : [
+      {
+        'match' : '((?:[\\$]{2}|[0]x)[\\da-fA-F]+)'
+        'name' : 'constant.numeric.integer.hexadecimal.rpl'
+      }
+      {
+        'match' : '([0]o[0-7]+)'
+        'name' : 'constant.numeric.integer.octal.rpl'
+      }
+      {
+        'match' : '((?:0b|%)[01]+)'
+        'name' : 'constant.numeric.integer.binary.rpl'
+      }
+      {
+        'match' : '([\\d]+_[\\d]+)'
+        'name' : 'constant.numeric.integer.non-decimal.rpl'
+      }
+      {
+        'match' : '(\\b\\d+)'
+        'name' : 'constant.numeric.integer.decimal.rpl'
+      }
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '(\\*\\*|<<|>>|[-\\x{002b}\\x{002a}\\x{002f}\\x{0026}\\x{007c}\\x{005e}\\x{0025}])'
+        'name' : 'keyword.operator.rpl'
+      }
+      {
+        'match' : '([\\x{003c}])|([\\x{003e}])'
+        'captures' : {
+          '1' : {
+            'name' : 'punctuation.definition.generic.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.generic.end.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'math_dash_string' : {
+    'patterns' : [
+      {
+        'begin' : '(--|[\\x{2013}\\x{2014}\\x{2015}])([\\+])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+          '2' : {
+            'name' : 'keyword.operator.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#math_dash_string__1'
+          }
+        ]
+        'end' : '(^(?=.{0,1})(?:|))'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'comment.line.number-sign.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'math_dash_string__1' : {
+    'patterns' : [
+      {
+        'include' : '#math_body'
+      }
+      {
+        'match' : '([\\(\\)])'
+        'name' : 'meta.brace.round.rpl.rpl'
+      }
+    ]
+  }
+  'math_literal' : {
+    'patterns' : [
+      {
+        'begin' : '([\\+])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'keyword.operator.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#math_literal__1'
+          }
+        ]
+        'end' : '(?![^\\x{003a}\\x{002c}\\x{0023}\\(\\[\\{\\)\\]\\}])|(?=$)'
+        'endCaptures' : {
+        }
+      }
+    ]
+  }
+  'math_literal__1' : {
+    'patterns' : [
+      {
+        'include' : '#math_body'
+      }
+    ]
+  }
+  'math_quoted1' : {
+    'patterns' : [
+      {
+        'begin' : '([\\x{0060}])([\\+])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+          '2' : {
+            'name' : 'keyword.operator.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#math_quoted1__1'
+          }
+        ]
+        'end' : '([\\x{0060}])'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'math_quoted1__1' : {
+    'patterns' : [
+      {
+        'include' : '#math_body'
+      }
+      {
+        'match' : '([\\(\\)])'
+        'name' : 'meta.brace.round.rpl.rpl'
+      }
+    ]
+  }
+  'math_quoted3' : {
+    'patterns' : [
+      {
+        'begin' : '([\\x{0060}]{3})([\\+])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+          '2' : {
+            'name' : 'keyword.operator.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#math_quoted3__1'
+          }
+        ]
+        'end' : '([\\x{0060}]{3})'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'math_quoted3__1' : {
+    'patterns' : [
+      {
+        'include' : '#math_body'
+      }
+      {
+        'match' : '([\\(\\)])'
+        'name' : 'meta.brace.round.rpl.rpl'
+      }
+    ]
+  }
+  'multistr' : {
+    'patterns' : [
+      {
+        'begin' : '(?=[\\x{0060}])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'none.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#multistr__1'
+          }
+        ]
+        'end' : '([\\x{002c}]|^(?=\\s*[^\\x{0023}\\x{0060}]))'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.delimiter.object.comma.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'multistr_1' : {
+    'patterns' : [
+      {
+        'begin' : '([\\x{0060}](?![\\x{0060}]))'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#multistr_1__1'
+          }
+        ]
+        'end' : '([\\x{0060}])'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'multistr_1__1' : {
+    'patterns' : [
+      {
+        'include' : '#multistr_inner'
+      }
+    ]
+  }
+  'multistr_2' : {
+    'patterns' : [
+      {
+        'begin' : '([\\x{0060}]{ 2 }(?![\\x{0060}]))'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#multistr_2__1'
+          }
+        ]
+        'end' : '([\\x{0060}]{ 2 })'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'multistr_2__1' : {
+    'patterns' : [
+      {
+        'include' : '#multistr_inner'
+      }
+    ]
+  }
+  'multistr_3' : {
+    'patterns' : [
+      {
+        'begin' : '([\\x{0060}]{ 3 }(?![\\x{0060}]))'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#multistr_3__1'
+          }
+        ]
+        'end' : '([\\x{0060}]{ 3 })'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'multistr_3__1' : {
+    'patterns' : [
+      {
+        'include' : '#multistr_inner'
+      }
+    ]
+  }
+  'multistr__1' : {
+    'patterns' : [
+      {
+        'include' : '#multistr_block'
+      }
+    ]
+  }
+  'multistr_block' : {
+    'patterns' : [
+      {
+        'include' : '#comment'
+      }
+      {
+        'include' : '#multistr_3'
+      }
+      {
+        'include' : '#multistr_2'
+      }
+      {
+        'include' : '#multistr_1'
+      }
+    ]
+  }
+  'multistr_inner' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{0060}\\$]+)'
+        'name' : 'string.quoted.single.block.rpl'
+      }
+    ]
+  }
+  'numeric' : {
+    'patterns' : [
+      {
+        'match' : '(?:(\\b\\d+)|([\\$][\\da-fA-F]+))(?=\\s*[\\x{003a}\\x{002c}\\x{0023}\\)\\]\\}]|\\s*$)'
+        'captures' : {
+          '1' : {
+            'name' : 'constant.numeric.integer.decimal.rpl'
+          }
+          '2' : {
+            'name' : 'constant.numeric.integer.non-decimal.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'range' : {
+    'patterns' : [
+      {
+        'match' : '(?:(\\b\\d+)|([\\$][\\da-fA-F]+))(\\s*)([-\\x{007e}\\x{002a}\\x{002b}\\x{00b1}]|\\+-)(\\s*)(?:(\\b\\d+)|([\\$][\\da-fA-F]+))'
+        'captures' : {
+          '1' : {
+            'name' : 'constant.numeric.integer.decimal.rpl'
+          }
+          '2' : {
+            'name' : 'constant.numeric.integer.hexadecimal.rpl'
+          }
+          '3' : {
+            'name' : 'none.rpl'
+          }
+          '4' : {
+            'name' : 'keyword.operator.range.rpl'
+          }
+          '5' : {
+            'name' : 'none.rpl'
+          }
+          '6' : {
+            'name' : 'constant.numeric.integer.decimal.rpl'
+          }
+          '7' : {
+            'name' : 'constant.numeric.integer.hexadecimal.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'reference' : {
+    'patterns' : [
+      {
+        'include' : '#reference_paren'
+      }
+      {
+        'include' : '#reference_brack'
+      }
+      {
+        'include' : '#reference_bare'
+      }
+    ]
+  }
+  'reference_bare' : {
+    'patterns' : [
+      {
+        'begin' : '([\\x{0040}])(\\s*)(?:(this|g*parent|w*back|Defs)|([\\w_\\d]+)|)'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'none.rpl'
+          }
+          '3' : {
+            'name' : 'variable.language.rpl'
+          }
+          '4' : {
+            'name' : 'entity.name.type.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#reference_inner'
+          }
+        ]
+        'end' : '(?!->|[\\[\\{.\\-\\x{2500}\\s\\x{0023}])'
+        'endCaptures' : {
+        }
+      }
+    ]
+  }
+  'reference_begin' : {
+    'patterns' : [
+      {
+        'begin' : '(?:(this|g*parent|w*back|Defs)|([\\w_\\d]+)|)'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'variable.language.rpl'
+          }
+          '2' : {
+            'name' : 'entity.name.type.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#reference_inner'
+          }
+        ]
+        'end' : '(?!->|[\\[\\{.\\-\\x{2500}\\s\\x{0023}])'
+        'endCaptures' : {
+        }
+      }
+    ]
+  }
+  'reference_brack' : {
+    'patterns' : [
+      {
+        'begin' : '([\\x{0040}])(\\s*)([\\[])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'none.rpl'
+          }
+          '3' : {
+            'name' : 'meta.brace.square.rpl.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#reference_brack__1'
+          }
+        ]
+        'end' : '([\\]])'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.brace.square.rpl.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'reference_brack__1' : {
+    'patterns' : [
+      {
+        'include' : '#reference_begin'
+      }
+    ]
+  }
+  'reference_inner' : {
+    'patterns' : [
+      {
+        'include' : '#comment'
+      }
+      {
+        'include' : '#index'
+      }
+      {
+        'include' : '#subscript'
+      }
+      {
+        'include' : '#reference_key'
+      }
+    ]
+  }
+  'reference_key' : {
+    'patterns' : [
+      {
+        'begin' : '(->|[.\\-\\x{2500}])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#reference_key__1'
+          }
+        ]
+        'end' : '(\\b[a-z][a-z\\d]*)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'support.variable.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'reference_key__1' : {
+    'patterns' : [
+      {
+        'include' : '#comment'
+      }
+    ]
+  }
+  'reference_paren' : {
+    'patterns' : [
+      {
+        'begin' : '([\\x{0040}])(\\s*)([\\(])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'none.rpl'
+          }
+          '3' : {
+            'name' : 'meta.brace.round.rpl.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#reference_paren__1'
+          }
+        ]
+        'end' : '([\\)])'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.brace.round.rpl.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'reference_paren__1' : {
+    'patterns' : [
+      {
+        'include' : '#reference_begin'
+      }
+    ]
+  }
+  'refmultistr' : {
+    'patterns' : [
+      {
+        'begin' : '(?=[\\x{0040}][\\x{0060}])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'none.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refmultistr__1'
+          }
+        ]
+        'end' : '([\\x{002c}]|^(?=\\s*(?![\\x{0023}\\x{0060}]|[\\x{0040}][\\x{0060}])))'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.delimiter.object.comma.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'refmultistr_1' : {
+    'patterns' : [
+      {
+        'begin' : '([\\x{0040}]?)([\\x{0060}](?![\\x{0060}]))'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refmultistr_1__1'
+          }
+        ]
+        'end' : '([\\x{0060}])'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'refmultistr_1__1' : {
+    'patterns' : [
+      {
+        'include' : '#refmultistr_inner'
+      }
+    ]
+  }
+  'refmultistr_2' : {
+    'patterns' : [
+      {
+        'begin' : '([\\x{0040}]?)([\\x{0060}]{ 2 }(?![\\x{0060}]))'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refmultistr_2__1'
+          }
+        ]
+        'end' : '([\\x{0060}]{ 2 })'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'refmultistr_2__1' : {
+    'patterns' : [
+      {
+        'include' : '#refmultistr_inner'
+      }
+    ]
+  }
+  'refmultistr_3' : {
+    'patterns' : [
+      {
+        'begin' : '([\\x{0040}]?)([\\x{0060}]{ 3 }(?![\\x{0060}]))'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refmultistr_3__1'
+          }
+        ]
+        'end' : '([\\x{0060}]{ 3 })'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'refmultistr_3__1' : {
+    'patterns' : [
+      {
+        'include' : '#refmultistr_inner'
+      }
+    ]
+  }
+  'refmultistr__1' : {
+    'patterns' : [
+      {
+        'include' : '#refmultistr_block'
+      }
+    ]
+  }
+  'refmultistr_block' : {
+    'patterns' : [
+      {
+        'include' : '#comment'
+      }
+      {
+        'include' : '#refmultistr_3'
+      }
+      {
+        'include' : '#refmultistr_2'
+      }
+      {
+        'include' : '#refmultistr_1'
+      }
+    ]
+  }
+  'refmultistr_inner' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#reference'
+      }
+      {
+        'match' : '([^\\x{0060}\\$\\x{0040}]+)'
+        'name' : 'string.quoted.single.block.rpl'
+      }
+    ]
+  }
+  'refstr_all' : {
+    'patterns' : [
+      {
+        'begin' : '([\\x{0040}])(\')'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__1'
+          }
+        ]
+        'end' : '([\\x{0027}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{ff07})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__2'
+          }
+        ]
+        'end' : '([\\x{ff07}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{2018})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__3'
+          }
+        ]
+        'end' : '([\\x{2018}\\x{2019}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{2019})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__4'
+          }
+        ]
+        'end' : '([\\x{2019}\\x{2018}\\x{201a}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{275b})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__5'
+          }
+        ]
+        'end' : '([\\x{275b}\\x{275c}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{275c})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__6'
+          }
+        ]
+        'end' : '([\\x{275c}\\x{275b}\\x{275f}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{201b})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__7'
+          }
+        ]
+        'end' : '([\\x{201b}\\x{2019}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{300c})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__8'
+          }
+        ]
+        'end' : '([\\x{300d}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{3008})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__9'
+          }
+        ]
+        'end' : '([\\x{3009}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{201a})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__10'
+          }
+        ]
+        'end' : '([\\x{2019}\\x{2018}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{275f})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__11'
+          }
+        ]
+        'end' : '([\\x{275c}\\x{275b}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{2039})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__12'
+          }
+        ]
+        'end' : '([\\x{203a}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{203a})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__13'
+          }
+        ]
+        'end' : '([\\x{2039}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{276e})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__14'
+          }
+        ]
+        'end' : '([\\x{276f}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{276f})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__15'
+          }
+        ]
+        'end' : '([\\x{276e}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(")'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__16'
+          }
+        ]
+        'end' : '([\\x{0022}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{ff02})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__17'
+          }
+        ]
+        'end' : '([\\x{ff02}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{201c})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__18'
+          }
+        ]
+        'end' : '([\\x{201c}\\x{201d}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{201d})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__19'
+          }
+        ]
+        'end' : '([\\x{201d}\\x{201e}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{275d})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__20'
+          }
+        ]
+        'end' : '([\\x{275d}\\x{275e}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{275e})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__21'
+          }
+        ]
+        'end' : '([\\x{275e}\\x{2760}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\u{s1:4x}\\u{s2:4x})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__22'
+          }
+        ]
+        'end' : '([\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\u{s1:4x}\\u{s2:4x})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__23'
+          }
+        ]
+        'end' : '([\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{201f})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__24'
+          }
+        ]
+        'end' : '([\\x{201f}\\x{201d}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{300e})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__25'
+          }
+        ]
+        'end' : '([\\x{300f}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{300a})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__26'
+          }
+        ]
+        'end' : '([\\x{300b}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{201e})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__27'
+          }
+        ]
+        'end' : '([\\x{201c}\\x{201d}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\x{2760})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__28'
+          }
+        ]
+        'end' : '([\\x{275d}\\x{275e}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\u{s1:4x}\\u{s2:4x})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__29'
+          }
+        ]
+        'end' : '([\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\u  ab)'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__30'
+          }
+        ]
+        'end' : '([\\u\\x{0020}\\x{0020}bb])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '([\\x{0040}])(\\u  bb)'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.mapping.begin.rpl'
+          }
+          '2' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#refstr_all__31'
+          }
+        ]
+        'end' : '([\\u\\x{0020}\\x{0020}ab\\u\\x{0020}\\x{0020}bb])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'refstr_all__1' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{0027}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__10' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{2019}\\x{2018}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__11' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{275c}\\x{275b}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__12' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{203a}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__13' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{2039}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__14' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{276f}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__15' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{276e}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__16' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{0022}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__17' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{ff02}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__18' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{201c}\\x{201d}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__19' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{201d}\\x{201e}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__2' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{ff07}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__20' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{275d}\\x{275e}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__21' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{275e}\\x{2760}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__22' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__23' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__24' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{201f}\\x{201d}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__25' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{300f}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__26' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{300b}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__27' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{201c}\\x{201d}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__28' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{275d}\\x{275e}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__29' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__3' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{2018}\\x{2019}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__30' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\u\\x{0020}\\x{0020}bb\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__31' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\u\\x{0020}\\x{0020}ab\\u\\x{0020}\\x{0020}bb\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__4' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{2019}\\x{2018}\\x{201a}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__5' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{275b}\\x{275c}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__6' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{275c}\\x{275b}\\x{275f}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__7' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{201b}\\x{2019}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__8' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{300d}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'refstr_all__9' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'include' : '#is_reference'
+      }
+      {
+        'match' : '([^\\x{3009}\\$\\x{0040}]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all' : {
+    'patterns' : [
+      {
+        'begin' : '(\')'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__1'
+          }
+        ]
+        'end' : '([\\x{0027}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{ff07})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__2'
+          }
+        ]
+        'end' : '([\\x{ff07}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{2018})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__3'
+          }
+        ]
+        'end' : '([\\x{2018}\\x{2019}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{2019})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__4'
+          }
+        ]
+        'end' : '([\\x{2019}\\x{2018}\\x{201a}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{275b})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__5'
+          }
+        ]
+        'end' : '([\\x{275b}\\x{275c}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{275c})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__6'
+          }
+        ]
+        'end' : '([\\x{275c}\\x{275b}\\x{275f}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{201b})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__7'
+          }
+        ]
+        'end' : '([\\x{201b}\\x{2019}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{300c})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__8'
+          }
+        ]
+        'end' : '([\\x{300d}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{3008})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__9'
+          }
+        ]
+        'end' : '([\\x{3009}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{201a})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__10'
+          }
+        ]
+        'end' : '([\\x{2019}\\x{2018}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{275f})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__11'
+          }
+        ]
+        'end' : '([\\x{275c}\\x{275b}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{2039})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__12'
+          }
+        ]
+        'end' : '([\\x{203a}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{203a})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__13'
+          }
+        ]
+        'end' : '([\\x{2039}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{276e})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__14'
+          }
+        ]
+        'end' : '([\\x{276f}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{276f})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__15'
+          }
+        ]
+        'end' : '([\\x{276e}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(")'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__16'
+          }
+        ]
+        'end' : '([\\x{0022}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{ff02})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__17'
+          }
+        ]
+        'end' : '([\\x{ff02}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{201c})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__18'
+          }
+        ]
+        'end' : '([\\x{201c}\\x{201d}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{201d})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__19'
+          }
+        ]
+        'end' : '([\\x{201d}\\x{201e}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{275d})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__20'
+          }
+        ]
+        'end' : '([\\x{275d}\\x{275e}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{275e})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__21'
+          }
+        ]
+        'end' : '([\\x{275e}\\x{2760}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\u{s1:4x}\\u{s2:4x})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__22'
+          }
+        ]
+        'end' : '([\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\u{s1:4x}\\u{s2:4x})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__23'
+          }
+        ]
+        'end' : '([\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{201f})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__24'
+          }
+        ]
+        'end' : '([\\x{201f}\\x{201d}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{300e})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__25'
+          }
+        ]
+        'end' : '([\\x{300f}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{300a})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__26'
+          }
+        ]
+        'end' : '([\\x{300b}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{201e})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__27'
+          }
+        ]
+        'end' : '([\\x{201c}\\x{201d}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\x{2760})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__28'
+          }
+        ]
+        'end' : '([\\x{275d}\\x{275e}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\u{s1:4x}\\u{s2:4x})'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__29'
+          }
+        ]
+        'end' : '([\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\u  ab)'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__30'
+          }
+        ]
+        'end' : '([\\u\\x{0020}\\x{0020}bb])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+      {
+        'begin' : '(\\u  bb)'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.begin.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#string_all__31'
+          }
+        ]
+        'end' : '([\\u\\x{0020}\\x{0020}ab\\u\\x{0020}\\x{0020}bb])|(.$)'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.definition.string.end.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'string_all__1' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{0027}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__10' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{2019}\\x{2018}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__11' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{275c}\\x{275b}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__12' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{203a}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__13' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{2039}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__14' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{276f}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__15' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{276e}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__16' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{0022}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__17' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{ff02}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__18' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{201c}\\x{201d}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__19' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{201d}\\x{201e}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__2' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{ff07}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__20' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{275d}\\x{275e}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__21' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{275e}\\x{2760}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__22' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__23' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__24' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{201f}\\x{201d}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__25' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{300f}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__26' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{300b}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__27' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{201c}\\x{201d}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__28' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{275d}\\x{275e}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__29' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\u\\x{007b}s1\\x{003a}4x\\x{007d}\\u\\x{007b}s2\\x{003a}4x\\x{007d}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__3' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{2018}\\x{2019}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__30' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\u\\x{0020}\\x{0020}bb\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__31' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\u\\x{0020}\\x{0020}ab\\u\\x{0020}\\x{0020}bb\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__4' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{2019}\\x{2018}\\x{201a}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__5' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{275b}\\x{275c}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__6' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{275c}\\x{275b}\\x{275f}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__7' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{201b}\\x{2019}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__8' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{300d}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_all__9' : {
+    'patterns' : [
+      {
+        'include' : '#string_escape'
+      }
+      {
+        'match' : '([^\\x{3009}\\$]+(?!$))'
+        'name' : 'string.quoted.single.rpl'
+      }
+    ]
+  }
+  'string_escape' : {
+    'patterns' : [
+      {
+        'match' : '([\\$](?:[\\da-fA-F]{2}|\\([\\da-fA-F]*\\)|[\\x{0022}\\x{0027}\\x{0060}znrt\\$\\x{0040}]))|([\\$].)'
+        'captures' : {
+          '1' : {
+            'name' : 'constant.character.escape.rpl'
+          }
+          '2' : {
+            'name' : 'invalid.illegal.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'strings' : {
+    'patterns' : [
+      {
+        'include' : '#refstr_all'
+      }
+      {
+        'include' : '#string_all'
+      }
+      {
+        'include' : '#dash_refstring'
+      }
+      {
+        'include' : '#math_dash_string'
+      }
+      {
+        'include' : '#dash_string'
+      }
+      {
+        'include' : '#refmultistr'
+      }
+      {
+        'include' : '#math_quoted3'
+      }
+      {
+        'include' : '#math_quoted1'
+      }
+      {
+        'include' : '#multistr'
+      }
+    ]
+  }
+  'struct_body' : {
+    'patterns' : [
+      {
+        'begin' : '([\\{])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#struct_body__1'
+          }
+        ]
+        'end' : '([\\}])'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'struct_body__1' : {
+    'patterns' : [
+      {
+        'include' : '#comment'
+      }
+      {
+        'begin' : '([\\x{003a}])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'support.variable.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#key_value_body'
+          }
+        ]
+        'end' : '([\\x{002c}]|(?=[\\}])|^(?=\\s*[^\\s\\x{003a}\\(\\[\\{]))'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.delimiter.object.comma.rpl'
+          }
+        }
+      }
+      {
+        'include' : '#comment'
+      }
+      {
+        'include' : '#strings'
+      }
+      {
+        'include' : '#reference'
+      }
+      {
+        'include' : '#range'
+      }
+      {
+        'include' : '#numeric'
+      }
+      {
+        'begin' : '(\\b[a-z][a-z\\d]*\\s*[\\x{003a}])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'support.variable.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#key_value_body'
+          }
+        ]
+        'end' : '([\\x{002c}]|(?=[\\}])|^(?=\\s*[^\\s\\x{003a}\\(\\[\\{]))'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.delimiter.object.comma.rpl'
+          }
+        }
+      }
+      {
+        'include' : '#list'
+      }
+      {
+        'include' : '#struct_type'
+      }
+      {
+        'include' : '#struct_name'
+      }
+      {
+        'include' : '#struct_body'
+      }
+    ]
+  }
+  'struct_name' : {
+    'patterns' : [
+      {
+        'match' : '(\\b[\\w_\\d]+)'
+        'name' : 'entity.name.type.rpl'
+      }
+    ]
+  }
+  'struct_type' : {
+    'patterns' : [
+      {
+        'match' : '(ROM|RPL|rom|rpl)|(\\b[a-z][a-z\\d]*)'
+        'captures' : {
+          '1' : {
+            'name' : 'keyword.rpl'
+          }
+          '2' : {
+            'name' : 'storage.type.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'subscript' : {
+    'patterns' : [
+      {
+        'begin' : '([\\{])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'punctuation.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#subscript__1'
+          }
+        ]
+        'end' : '([\\}])'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'subscript__1' : {
+    'patterns' : [
+      {
+        'include' : '#comment'
+      }
+      {
+        'include' : '#literal'
+      }
+    ]
+  }
+  'value_body' : {
+    'patterns' : [
+      {
+        'include' : '#comment'
+      }
+      {
+        'include' : '#strings'
+      }
+      {
+        'include' : '#reference'
+      }
+      {
+        'include' : '#range'
+      }
+      {
+        'include' : '#numeric'
+      }
+      {
+        'include' : '#list'
+      }
+      {
+        'include' : '#concat'
+      }
+      {
+        'include' : '#literals'
+      }
+      {
+        'include' : '#value_struct_tp'
+      }
+      {
+        'include' : '#value_struct_tl'
+      }
+      {
+        'include' : '#value_struct_tb'
+      }
+    ]
+  }
+  'value_struct_p' : {
+    'patterns' : [
+      {
+        'begin' : '(?=[\\(])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'storage.type.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#value_struct_p__1'
+          }
+        ]
+        'end' : '([\\)])'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.brace.round.rpl.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'value_struct_p__1' : {
+    'patterns' : [
+      {
+        'begin' : '([\\(])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'meta.brace.round.rpl.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#value_body'
+          }
+        ]
+        'end' : '([\\x{002c}]|(?=[\\)\\]\\}]))'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.delimiter.object.comma.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'value_struct_tb' : {
+    'patterns' : [
+      {
+        'begin' : '(\\b[a-z][a-z\\d]*)(?=\\s*[\\{])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'storage.type.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#value_struct_tb__1'
+          }
+        ]
+        'end' : '([\\}])'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'punctuation.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'value_struct_tb__1' : {
+    'patterns' : [
+      {
+        'include' : '#struct_body'
+      }
+    ]
+  }
+  'value_struct_tl' : {
+    'patterns' : [
+      {
+        'begin' : '(\\b[a-z][a-z\\d]*)(?=\\s*[\\[])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'storage.type.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#value_struct_tl__1'
+          }
+        ]
+        'end' : '([\\]])'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.brace.square.rpl.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'value_struct_tl__1' : {
+    'patterns' : [
+      {
+        'begin' : '([\\[])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'meta.brace.square.rpl.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#value_body'
+          }
+        ]
+        'end' : '([\\x{002c}]|(?=[\\)\\]\\}]))'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.delimiter.object.comma.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'value_struct_tp' : {
+    'patterns' : [
+      {
+        'begin' : '(\\b[a-z][a-z\\d]*)(?=\\s*[\\(])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'storage.type.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#value_struct_tp__1'
+          }
+        ]
+        'end' : '([\\)])'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.brace.round.rpl.rpl'
+          }
+        }
+      }
+    ]
+  }
+  'value_struct_tp__1' : {
+    'patterns' : [
+      {
+        'begin' : '([\\(])'
+        'beginCaptures' : {
+          '1' : {
+            'name' : 'meta.brace.round.rpl.rpl'
+          }
+        }
+        'patterns' : [
+          {
+            'include' : '#value_body'
+          }
+        ]
+        'end' : '([\\x{002c}]|(?=[\\)\\]\\}]))'
+        'endCaptures' : {
+          '1' : {
+            'name' : 'meta.delimiter.object.comma.rpl'
+          }
+        }
+      }
+    ]
+  }
+}

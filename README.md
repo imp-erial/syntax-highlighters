@@ -16,6 +16,16 @@ This is a test file meant to cover all good and bad syntax forms of note. Depend
 
 Any bad cases are marked with a comment `# bad`
 
+## Iro ##
+The `.iro` version is meant for use in: https://eeyo.io/iro/
+
+This tool can generate definitions for other editors but is somewhat inefficient and has some limitations:
+
+* Doesn't support pop-to-push backreferences (needed for arbitrarily long multistring quotes).
+* Documentation made it sound like Unicode support is iffy but haven't had problems yet?
+* Cannot generate things like `meta.*` bodies for segments in Textmate/Sublime.
+* Forces you to highlight things that don't matter, like whitespace, for some reason.
+
 ## Planned definitions ##
 
 * Textmate
