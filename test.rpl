@@ -82,6 +82,9 @@ number(
 
 @(
     All.on.line[2])
+@A[lit]
+@A["str"]
+@A[math(@B.x + 1)]
 
 # Ref strings
 @"bare @To.end"
@@ -92,6 +95,10 @@ number(
 @"a @( Paren.bad 
 ) b" # bad
 @"I @[Should.test.this] I guess"
+@"a @A[b] b"
+@"a @A[math(1+2)] b"
+@"a @A['b'] b" # if this is an error that's ok
+@"a @A{B" # bad
 
 @`a @Test b`
 `c @ShouldHighlight d`
